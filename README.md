@@ -47,8 +47,8 @@ Airbnb 와 같은 숙박 공유 서비스입니다.
 
 ## Event Storming 결과
 * MSAEz 로 모델링한 이벤트스토밍 결과
-** 논리 : 
-** 물리
+![image](https://user-images.githubusercontent.com/61722732/87421855-93d2d400-c612-11ea-926b-070fdb11e150.PNG)
+
 
 ### 이벤트 도출
 1. 숙소등록됨

@@ -48,7 +48,7 @@ Airbnb 와 같은 숙박 공유 서비스입니다.
 # 분석/설계
 
 ## Event Storming 결과
-* MSAEz 로 모델링한 이벤트스토밍 결과:  http://msaez.io/#/storming/nZJ2QhwVc4NlVJPbtTkZ8x9jclF2/every/a77281d704710b0c2e6a823b6e6d973a/-M5AV2z--su_i4BfQfeF
+* MSAEz 로 모델링한 이벤트스토밍 결과:  http://msaez.io/#/storming/TWDBQXDzOJbymFE78o3DdlQ90XG3/mine/2f61f8e783098ff1c0846577ac58a501/-MCC2oCiz6DSlgm7vrPj
 
 
 ### 이벤트 도출

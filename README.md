@@ -113,8 +113,6 @@ Airbnb 와 같은 숙박 공유 서비스입니다.
 
 ### 기능적 요구사항 검증
 
-![image](https://user-images.githubusercontent.com/487999/79684167-3ecd2f00-826a-11ea-806a-957362d197e3.png)
-
   * 호스트가 본인이 등록한 숙소 목록을 조회한다. (ok)
   * 호스트가 속소를 신규 공유한다. (ok)
   * 호스트가 숙소 정보를 변경한다. (ok)
@@ -142,7 +140,6 @@ Airbnb 와 같은 숙박 공유 서비스입니다.
 ## 헥사고날 아키텍처 다이어그램 도출
     
 ![image](https://user-images.githubusercontent.com/487999/79684772-eba9ab00-826e-11ea-9405-17e2bf39ec76.png)
-
 
     - Chris Richardson, MSA Patterns 참고하여 Inbound adaptor와 Outbound adaptor를 구분함
     - 호출관계에서 PubSub 과 Req/Resp 를 구분함
@@ -265,7 +262,7 @@ http localhost:8082/예약s/1
 
 분석단계에서의 조건 중 하나로 예약->결제 간의 호출은 동기식 일관성을 유지하는 트랜잭션으로 처리하기로 하였다. 호출 프로토콜은 이미 앞서 Rest Repository 에 의해 노출되어있는 REST 서비스를 FeignClient 를 이용하여 호출하도록 한다. 
 
-- 결제서비스를 호출하기 위하여 Stub과 (FeignClient) 를 이용하여 Service 대행 인터페이스 (Proxy) 를 구현 
+- 결제 서비스를 호출하기 위하여 Stub과 (FeignClient) 를 이용하여 Service 대행 인터페이스 (Proxy) 를 구현 
 
 ```
 @FeignClient(name="결제", url="http://결제:8083")
@@ -278,7 +275,7 @@ public interface 결제관리Service {
 
 ```
 
-- 주문을 받은 직후(@PostPersist) 결제를 요청하도록 처리
+- 예약을 받은 직후(@PostPersist) 결제를 요청하도록 처리
 ```
 @Entity
 @Table(name="예약관리_table")
@@ -321,7 +318,6 @@ http localhost:8082/예약s roomId=2  #Success
 결제가 이루어진 후에 알림 처리는 동기식이 아니라 비 동기식으로 처리하여 알림 시스템의 처리를 위하여 예약이 블로킹 되지 않아도록 처리한다.
  
 - 이를 위하여 예약관리, 결제관리에 기록을 남긴 후에 곧바로 완료되었다는 도메인 이벤트를 카프카로 송출한다(Publish)
- 
 ```
 package mybnb;
 
@@ -339,8 +335,8 @@ public class 결제관리 {
 
 }
 ```
-- 알림 서비스에서는 예약완료, 결제승인 이벤트에 대해서 이를 수신하여 자신의 정책을 처리하도록 PolicyHandler 를 구현한다:
 
+- 알림 서비스에서는 예약완료, 결제승인 이벤트에 대해서 이를 수신하여 자신의 정책을 처리하도록 PolicyHandler 를 구현한다:
 ```
 @Service
 public class PolicyHandler{
@@ -361,8 +357,8 @@ public class PolicyHandler{
     
 }
 ```
-실제 구현을 하자면, 카톡 등으로 알림을 처리합니다.:
-  
+
+- 실제 구현을 하자면, 카톡 등으로 알림을 처리합니다.:
 ```
   @Autowired 알림이력Repository 알림이력Repository;
   
@@ -403,15 +399,14 @@ http localhost:8082/알림이력s # 알림이력조회
 
 ## CI/CD 설정
 
-
-각 구현체들은 각자의 source repository 에 구성되었고, 사용한 CI/CD 플랫폼은 GCP를 사용하였으며, pipeline build script 는 각 프로젝트 폴더 이하에 cloudbuild.yml 에 포함되었다.
-
-
+  * 각 구현체들은 github의 각각의 source repository 에 구성
+  * 사용 CI/CD 플랫폼은 ? 
+  
 ## 동기식 호출 / 서킷 브레이킹 / 장애격리
 
 * 서킷 브레이킹 프레임워크의 선택: Spring FeignClient + Hystrix 옵션을 사용하여 구현함
 
-시나리오는 단말앱(app)-->결제(pay) 시의 연결을 RESTful Request/Response 로 연동하여 구현이 되어있고, 결제 요청이 과도할 경우 CB 를 통하여 장애격리.
+시나리오는 예약-->결제 시의 연결을 RESTful Request/Response 로 연동하여 구현이 되어있고, 결제 요청이 과도할 경우 CB 를 통하여 장애격리.
 
 - Hystrix 를 설정:  요청처리 쓰레드에서 처리시간이 610 밀리가 넘어서기 시작하여 어느정도 유지되면 CB 회로가 닫히도록 (요청을 빠르게 실패처리, 차단) 설정
 ```
@@ -425,9 +420,9 @@ hystrix:
 
 ```
 
-- 피호출 서비스(결제:pay) 의 임의 부하 처리 - 400 밀리에서 증감 220 밀리 정도 왔다갔다 하게
+- 피호출 서비스(결제) 의 임의 부하 처리 - 400 밀리에서 증감 220 밀리 정도 왔다갔다 하게
 ```
-# (pay) 결제이력.java (Entity)
+# 결제관리.java (Entity)
 
     @PrePersist
     public void onPrePersist(){  //결제이력을 저장한 후 적당한 시간 끌기
@@ -527,7 +522,6 @@ HTTP/1.1 201     4.70 secs:     207 bytes ==> POST http://localhost:8081/orders
 HTTP/1.1 201     4.69 secs:     207 bytes ==> POST http://localhost:8081/orders
 
 * 이후 이러한 패턴이 계속 반복되면서 시스템은 도미노 현상이나 자원 소모의 폭주 없이 잘 운영됨
-
 
 HTTP/1.1 500     4.76 secs:     248 bytes ==> POST http://localhost:8081/orders
 HTTP/1.1 500     4.23 secs:     248 bytes ==> POST http://localhost:8081/orders
@@ -656,8 +650,7 @@ Throughput:		        0.01 MB/sec
 Concurrency:		       96.02
 
 ```
-배포기간중 Availability 가 평소 100%에서 70% 대로 떨어지는 것을 확인. 원인은 쿠버네티스가 성급하게 새로 올려진 서비스를 READY 상태로 인식하여 서비스 유입을 진행한 것이기 때문. 이를 막기위해 Readiness Probe 를 설정함:
-
+- 배포기간중 Availability 가 평소 100%에서 70% 대로 떨어지는 것을 확인. 원인은 쿠버네티스가 성급하게 새로 올려진 서비스를 READY 상태로 인식하여 서비스 유입을 진행한 것이기 때문. 이를 막기위해 Readiness Probe 를 설정함:
 ```
 # deployment.yaml 의 readiness probe 의 설정:
 

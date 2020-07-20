@@ -10,5 +10,5 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
  @RestController
- public class NotificationHistoryController {
+ public class AlarmController {
  }

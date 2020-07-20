@@ -28,7 +28,7 @@ public class GuestPageViewHandler {
                 // view 객체에 이벤트의 Value 를 set 함
                 guestPage.setGuestId(booked.getGuestId());
                 guestPage.setRoomId(booked.getRoomId());
-                guestPage.setPrice(booked.get금액());
+                guestPage.setPrice(booked.getPrice());
                 guestPage.setStatus(booked.getStatus());
                 guestPage.setBookId(booked.getId());
                 // view 레파지 토리에 save

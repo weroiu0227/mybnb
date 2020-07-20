@@ -29,11 +29,11 @@ public class Booked extends AbstractEvent {
     public void setRoomId(Long roomId) {
         this.roomId = roomId;
     }
-    public Long get금액() {
+    public Long getPrice() {
         return price;
     }
 
-    public void set금액(Long price) {
+    public void setPrice(Long price) {
         this.price = price;
     }
     public String getStatus() {

@@ -1,8 +1,6 @@
 package mybnb;
 
 import mybnb.config.kafka.KafkaProcessor;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -12,7 +10,7 @@ import org.springframework.stereotype.Service;
 public class PolicyHandler{
 
     @Autowired
-    private NotificationHistoryRepository notificationHistoryRepository;
+    private AlarmRepository alarmRepository;
 
     @StreamListener(KafkaProcessor.INPUT)
     public void onStringEventListener(@Payload String eventString){
@@ -60,10 +58,10 @@ public class PolicyHandler{
     }
 
     private void addNotificationHistory(long receiver, String message) {
-        NotificationHistory history = new NotificationHistory();
+        Alarm history = new Alarm();
         history.setReceiver(String.valueOf(receiver));
         history.setMessage(message);
-        notificationHistoryRepository.save(history);
+        alarmRepository.save(history);
     }
 
 }

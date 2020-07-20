@@ -6,7 +6,7 @@ import java.util.List;
 
 @Entity
 @Table(name="NotificationHistory_table")
-public class NotificationHistory {
+public class Alarm {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)

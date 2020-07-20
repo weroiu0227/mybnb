@@ -27,7 +27,7 @@ public class HostPageViewHandler {
                 hostPage.setRoomId(booked.getRoomId());
                 hostPage.setGuestId(booked.getGuestId());
                 hostPage.setBookId(booked.getId());
-                hostPage.setPrice(booked.get금액());
+                hostPage.setPrice(booked.getPrice());
                 hostPage.setStatus(booked.getStatus());
                 // view 레파지 토리에 save
                 hostPageRepository.save(hostPage);

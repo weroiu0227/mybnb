@@ -1,5 +1,5 @@
 server:
-  port: 8088
+  port: 8080
 
 ---
 
@@ -31,7 +31,7 @@ spring:
         - id: alarm
           uri: http://localhost:8086
           predicates:
-            - Path=/notificationHistories/** 
+            - Path=/alarms/**
       globalcors:
         corsConfigurations:
           '[/**]':
@@ -74,7 +74,7 @@ spring:
         - id: alarm
           uri: http://alarm:8080
           predicates:
-            - Path=/notificationHistories/** 
+            - Path=/alarms/**
       globalcors:
         corsConfigurations:
           '[/**]':

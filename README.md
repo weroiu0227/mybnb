@@ -437,6 +437,8 @@ hystrix:
     }
 ```
 
+* kubectl create deploy siege --image=apexacme/siege-nginx
+* kubtctl exec -it pod/siege -- /bin/bash
 * 부하테스터 siege 툴을 통한 서킷 브레이커 동작 확인:
 - 동시사용자 100명
 - 60초 동안 실시

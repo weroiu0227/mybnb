@@ -23,7 +23,7 @@ spring:
         - id: mypage
           uri: http://localhost:8084
           predicates:
-            - Path= /guestPages/**,/hostPages/**
+            - Path= /mypages/**
         - id: review
           uri: http://localhost:8085
           predicates:
@@ -32,6 +32,10 @@ spring:
           uri: http://localhost:8086
           predicates:
             - Path=/alarms/**
+        - id: html
+          uri: http://localhost:8087
+          predicates:
+            - Path=/html/**
       globalcors:
         corsConfigurations:
           '[/**]':
@@ -42,7 +46,6 @@ spring:
             allowedHeaders:
               - "*"
             allowCredentials: true
-
 
 ---
 
@@ -66,7 +69,7 @@ spring:
         - id: mypage
           uri: http://mypage:8080
           predicates:
-            - Path= /guestPages/**,/hostPages/**
+            - Path= /mypages/**
         - id: review
           uri: http://review:8080
           predicates:
@@ -75,6 +78,10 @@ spring:
           uri: http://alarm:8080
           predicates:
             - Path=/alarms/**
+        - id: html
+          uri: http://html:8080
+          predicates:
+            - Path=/html/**
       globalcors:
         corsConfigurations:
           '[/**]':

@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: booking
-          image: username/booking:latest
+          image: jihwancha/booking:latest
           ports:
             - containerPort: 8080
           readinessProbe:

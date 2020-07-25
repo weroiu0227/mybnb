@@ -1,8 +1,14 @@
-
 package mybnb;
 
-public class PayApproved extends AbstractEvent {
+import javax.persistence.*;
+import java.util.List;
 
+@Entity
+@Table(name="GuestPage_table")
+public class Mypage {
+
+    @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
     private Long bookId;
     private Long roomId;
@@ -12,6 +18,7 @@ public class PayApproved extends AbstractEvent {
     private String host;
     private String guest;
     private String usedate;
+    private Integer score;
     private String status;
 
     public Long getId() {
@@ -84,6 +91,14 @@ public class PayApproved extends AbstractEvent {
 
     public void setUsedate(String usedate) {
         this.usedate = usedate;
+    }
+
+    public Integer getScore() {
+        return score;
+    }
+
+    public void setScore(Integer score) {
+        this.score = score;
     }
 
     public String getStatus() {

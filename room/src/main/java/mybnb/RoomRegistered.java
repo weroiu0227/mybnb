@@ -3,9 +3,9 @@ package mybnb;
 public class RoomRegistered extends AbstractEvent {
 
     private Long id;
-    private Long hostId;
+    private String host;
     private String name;
-    private String price;
+    private Long price;
     private String address;
     private String status;
 
@@ -20,13 +20,15 @@ public class RoomRegistered extends AbstractEvent {
     public void setId(Long id) {
         this.id = id;
     }
-    public Long getHostId() {
-        return hostId;
+
+    public String getHost() {
+        return host;
     }
 
-    public void setHostId(Long hostId) {
-        this.hostId = hostId;
+    public void setHost(String host) {
+        this.host = host;
     }
+
     public String getName() {
         return name;
     }
@@ -34,13 +36,15 @@ public class RoomRegistered extends AbstractEvent {
     public void setName(String name) {
         this.name = name;
     }
-    public String getPrice() {
+
+    public Long getPrice() {
         return price;
     }
 
-    public void setPrice(String price) {
+    public void setPrice(Long price) {
         this.price = price;
     }
+
     public String getAddress() {
         return address;
     }
@@ -48,6 +52,7 @@ public class RoomRegistered extends AbstractEvent {
     public void setAddress(String address) {
         this.address = address;
     }
+
     public String getStatus() {
         return status;
     }

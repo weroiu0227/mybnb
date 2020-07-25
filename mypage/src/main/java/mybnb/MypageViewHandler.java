@@ -6,31 +6,37 @@ import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 @Service
-public class HostPageViewHandler {
+public class MypageViewHandler {
 
 
     @Autowired
-    private HostPageRepository hostPageRepository;
+    private MypageRepository mypageRepository;
 
     @StreamListener(KafkaProcessor.INPUT)
     public void whenBooked_then_CREATE_1 (@Payload Booked booked) {
         try {
             if (booked.isMe()) {
+                System.out.println("Booked " + booked.toJson());
+
                 // view 객체 생성
-                HostPage hostPage = new HostPage();
+                Mypage mypage = new Mypage();
+
                 // view 객체에 이벤트의 Value 를 set 함
-                hostPage.setRoomId(booked.getRoomId());
-                hostPage.setGuestId(booked.getGuestId());
-                hostPage.setBookId(booked.getId());
-                hostPage.setPrice(booked.getPrice());
-                hostPage.setStatus(booked.getStatus());
+                mypage.setBookId(booked.getId());
+                mypage.setRoomId(booked.getRoomId());
+                mypage.setName(booked.getName());
+                mypage.setPrice(booked.getPrice());
+                mypage.setAddress(booked.getAddress());
+                mypage.setHost(booked.getHost());
+                mypage.setGuest(booked.getGuest());
+                mypage.setUsedate(booked.getUsedate());
+                mypage.setStatus(booked.getStatus());
+
                 // view 레파지 토리에 save
-                hostPageRepository.save(hostPage);
+                mypageRepository.save(mypage);
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -43,12 +49,12 @@ public class HostPageViewHandler {
         try {
             if (bookCanceled.isMe()) {
                 // view 객체 조회
-                List<HostPage> hostPageList = hostPageRepository.findByBookId(bookCanceled.getId());
-                for(HostPage hostPage : hostPageList){
+                List<Mypage> mypageList = mypageRepository.findByBookId(bookCanceled.getId());
+                for(Mypage mypage : mypageList){
                     // view 객체에 이벤트의 eventDirectValue 를 set 함
-                    hostPage.setStatus(bookCanceled.getStatus());
+                    mypage.setStatus(bookCanceled.getStatus());
                     // view 레파지 토리에 save
-                    hostPageRepository.save(hostPage);
+                    mypageRepository.save(mypage);
                 }
             }
         }catch (Exception e){
@@ -60,12 +66,12 @@ public class HostPageViewHandler {
         try {
             if (payCanceled.isMe()) {
                 // view 객체 조회
-                List<HostPage> hostPageList = hostPageRepository.findByBookId(payCanceled.getId());
-                for(HostPage hostPage : hostPageList){
+                List<Mypage> mypageList = mypageRepository.findByBookId(payCanceled.getBookId());
+                for(Mypage mypage : mypageList){
                     // view 객체에 이벤트의 eventDirectValue 를 set 함
-                    hostPage.setStatus(payCanceled.getStatus());
+                    mypage.setStatus(payCanceled.getStatus());
                     // view 레파지 토리에 save
-                    hostPageRepository.save(hostPage);
+                    mypageRepository.save(mypage);
                 }
             }
         }catch (Exception e){
@@ -77,12 +83,13 @@ public class HostPageViewHandler {
         try {
             if (reviewRegistered.isMe()) {
                 // view 객체 조회
-                List<HostPage> hostPageList = hostPageRepository.findByBookId(reviewRegistered.getBookId());
-                for(HostPage hostPage : hostPageList){
+                List<Mypage> mypageList = mypageRepository.findByBookId(reviewRegistered.getBookId());
+                for(Mypage mypage : mypageList){
                     // view 객체에 이벤트의 eventDirectValue 를 set 함
-                    hostPage.setScore(reviewRegistered.getScore());
+                    mypage.setScore(reviewRegistered.getScore());
+                    mypage.setStatus(reviewRegistered.getStatus());
                     // view 레파지 토리에 save
-                    hostPageRepository.save(hostPage);
+                    mypageRepository.save(mypage);
                 }
             }
         }catch (Exception e){

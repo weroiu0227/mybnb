@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Mybnb.com (공유 숙소 서비스 따라하기)</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <script type="text/javascript">
+
+jQuery(document).ready(function() {
+
+    $("#btnAdd").click(function() {
+        addRoom();
+    });
+
+    function addRoom() {
+        var data = {};
+
+        data['name']    = $("#name").val();
+        data['price']   = $("#price").val();
+        data['address'] = $("#address").val();
+        data['host']    = $("#host").val();
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            dataType: 'json',
+            url: "/rooms",
+            data: JSON.stringify(data),
+            success: function(result){
+                console.log(result);
+                //var totalcnt = result.page.totalElements;
+                //var bookings = result._embedded.bookings;
+
+<!--
+                $("#name").val("");
+                $("#price").val("");
+                $("#address").val("");
+                $("#host").val("");
+-->
+
+                alert("숙소 등록 완료");
+                window.opener.location.reload();
+                window.close();
+            },
+
+            error: function (status) {
+                //alert('fail' + status);
+                alert("숙소 등록 실패");
+                window.opener.location.reload();
+                window.close();
+             }
+        })
+    }
+
+});
+    </script>
+
+</head>
+<body>
+    <h2>(Host) 숙소 등록</h2>
+    <table style="width: 100%; border:1px solid black;">
+        <tbody>
+            <tr>
+                <th>이름</th>
+                <td><input type="text" id="name"></td>
+            </tr>
+            <tr>
+                <th>가격</th>
+                <td><input type="text" id="price"></td>
+            </tr>
+            <tr>
+                <th>주소</th>
+                <td><input type="text" id="address"></td>
+            </tr>
+            <tr>
+                <th>호스트</th>
+                <td><input type="text" id="host"></td>
+            </tr>
+        </tbody>
+    </table>
+    <div style="width:100%; text-align:right; margin-top:5px;"><button id="btnAdd">등록</button></div>
+</body>
+</html>
+

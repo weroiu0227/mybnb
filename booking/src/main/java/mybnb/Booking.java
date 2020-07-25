@@ -11,9 +11,14 @@ public class Booking {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
-    private Long guestId;
+
     private Long roomId;
+    private String name;
     private Long price;
+    private String address;
+    private String host;
+    private String guest;
+    private String usedate;
 
     public Long getId() {
         return id;
@@ -21,23 +26,61 @@ public class Booking {
     public void setId(Long id) {
         this.id = id;
     }
-    public Long getGuestId() {
-        return guestId;
-    }
-    public void setGuestId(Long guestId) {
-        this.guestId = guestId;
-    }
+
     public Long getRoomId() {
         return roomId;
     }
+
     public void setRoomId(Long roomId) {
         this.roomId = roomId;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public Long getPrice() {
         return price;
     }
+
     public void setPrice(Long price) {
         this.price = price;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public String getGuest() {
+        return guest;
+    }
+
+    public void setGuest(String guest) {
+        this.guest = guest;
+    }
+
+    public String getUsedate() {
+        return usedate;
+    }
+
+    public void setUsedate(String usedate) {
+        this.usedate = usedate;
     }
 
     @PostPersist
@@ -46,9 +89,13 @@ public class Booking {
         {
             mybnb.external.Payment payment = new mybnb.external.Payment();
             payment.setBookId(getId());
-            payment.setGuestId(getGuestId());
             payment.setRoomId(getRoomId());
+            payment.setGuest(getGuest());
             payment.setPrice(getPrice());
+            payment.setName(getName());
+            payment.setHost(getHost());
+            payment.setAddress(getAddress());
+            payment.setUsedate(getUsedate());
             payment.setStatus("PayApproved");
             // mappings goes here
             BookingApplication.applicationContext.getBean(mybnb.external.PaymentService.class)

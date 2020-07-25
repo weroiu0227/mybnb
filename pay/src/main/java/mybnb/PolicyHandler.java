@@ -26,9 +26,13 @@ public class PolicyHandler{
         if(bookCanceled.isMe()){
             Payment payment = new Payment();
             payment.setBookId(bookCanceled.getId());
-            payment.setGuestId(bookCanceled.getGuestId());
             payment.setRoomId(bookCanceled.getRoomId());
+            payment.setName(bookCanceled.getName());
+            payment.setGuest(bookCanceled.getGuest());
             payment.setPrice(bookCanceled.getPrice());
+            payment.setHost(bookCanceled.getHost());
+            payment.setUsedate(bookCanceled.getUsedate());
+            payment.setAddress(bookCanceled.getAddress());
             payment.setStatus("PayCanceled");
             paymentRepository.save(payment);
         }

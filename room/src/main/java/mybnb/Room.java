@@ -11,10 +11,10 @@ public class Room {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
-    private Long hostId;
     private String name;
-    private String price;
+    private Long price;
     private String address;
+    private String host;
 
     public Long getId() {
         return id;
@@ -22,22 +22,16 @@ public class Room {
     public void setId(Long id) {
         this.id = id;
     }
-    public Long getHostId() {
-        return hostId;
-    }
-    public void setHostId(Long hostId) {
-        this.hostId = hostId;
-    }
     public String getName() {
         return name;
     }
     public void setName(String name) {
         this.name = name;
     }
-    public String getPrice() {
+    public Long getPrice() {
         return price;
     }
-    public void setPrice(String price) {
+    public void setPrice(Long price) {
         this.price = price;
     }
     public String getAddress() {
@@ -45,6 +39,12 @@ public class Room {
     }
     public void setAddress(String address) {
         this.address = address;
+    }
+    public String getHost() {
+        return host;
+    }
+    public void setHost(String host) {
+        this.host = host;
     }
 
     @PostPersist

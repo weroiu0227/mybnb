@@ -8,69 +8,73 @@
 
 jQuery(document).ready(function(){
 
-    loadRoom();
+    loadBooking();
 
-    $("#btnBook").click(function() {
-        addBook();
+    $("#btnReview").click(function() {
+        addReview();
     });
 
-    function loadRoom() {
-        var roomId = location.href.substr(
+    function loadBooking() {
+        var bookId = location.href.substr(
             location.href.lastIndexOf('?') + 1
         );
-        //alert("room id:" + roomId);
 
         $.ajax({
             type: "GET",
             contentType: "application/json",
             dataType: 'json',
-            url: "/rooms/" + roomId,
+            url: "/bookings/" + bookId,
             //data: JSON.stringify(data),
             success: function(result){
                 console.log(result);
 
-                $("#roomId").val(roomId);
+                $("#bookId").val(bookId);
+                $("#usedate").val(result.usedate);
+                $("#guest").val(result.guest);
+                $("#roomId").val(result.roomId);
                 $("#name").val(result.name);
-                $("#price").val(result.price);
                 $("#address").val(result.address);
                 $("#host").val(result.host);
             },
 
             error: function (status) {
-                alert("숙소 정보 조회 실패. " + status);
+                alert("예약 정보 조회 실패. " + status);
                 window.close();
              }
         });
     }
 
-    function addBook() {
+    function addReview() {
         var data = {};
 
+        data['bookId']   = $("#bookId").val();
+        data['usedate']  = $("#usedate").val();
+        data['guest']    = $("#guest").val();
         data['roomId']   = $("#roomId").val();
         data['name']     = $("#name").val();
-        data['price']    = $("#price").val();
         data['address']  = $("#address").val();
         data['host']     = $("#host").val();
-        data['guest']    = $("#guest").val();
-        data['usedate']  = $("#usedate").val();
+
+        data['score']   = $("#score").val();
+        data['content']  = $("#content").val();
 
         $.ajax({
             type: "POST",
             contentType: "application/json",
             dataType: 'json',
-            url: "/bookings",
+            url: "/reviews",
             data: JSON.stringify(data),
             success: function(result){
                 console.log(result);
 
-                alert("예약 완료");
+                alert("리뷰 등록 완료");
                 window.opener.location.reload();
                 window.close();
             },
 
             error: function (status) {
                 //alert('fail' + status);
-                alert("예약 실패");
+                alert("리뷰 등록 실패");
                 window.opener.location.reload();
                 window.close();
              }
@@ -82,23 +86,31 @@ jQuery(document).ready(function(){
 
 </head>
 <body>
-    <h2>숙소 예약하기</h2>
+    <h2>리뷰 작성하기</h2>
     <table style="width: 100%; border:1px solid black;">
         <tbody>
             <tr>
-                <th>ID</th>
+                <th>예약ID</th>
+                <td><input type="text" id="bookId" readonly></td>
+            </tr>
+            <tr>
+                <th>예약자</th>
+                <td><input type="text" id="guest" readonly></td>
+            </tr>
+            <tr>
+                <th>사용일자</th>
+                <td><input type="text" id="usedate" readonly></td>
+            </tr>
+            <tr>
+                <th>숙소 ID</th>
                 <td><input type="text" id="roomId" readonly></td>
             </tr>
             <tr>
-                <th>이름</th>
+                <th>숙소 이름</th>
                 <td><input type="text" id="name" readonly></td>
             </tr>
             <tr>
-                <th>가격</th>
-                <td><input type="text" id="price" readonly></td>
-            </tr>
-            <tr>
-                <th>주소</th>
+                <th>숙소 주소</th>
                 <td><input type="text" id="address" readonly></td>
             </tr>
             <tr>
@@ -106,16 +118,16 @@ jQuery(document).ready(function(){
                 <td><input type="text" id="host" readonly></td>
             </tr>
             <tr>
-                <th>예약자</th>
-                <td><input type="text" id="guest"></td>
+                <th>리뷰 점수</th>
+                <td><input type="text" id="score"></td>
             </tr>
             <tr>
-                <th>사용일자</th>
-                <td><input type="text" id="usedate"></td>
-            </tr>
+                <th>리뷰 내용</th>
+                <td><input type="text" id="content"></td>
+            </tr>록
         </tbody>
     </table>
-    <div style="width:100%; text-align:right; margin-top:5px;"><button id="btnBook">예약</button></div>
+    <div style="width:100%; text-align:right; margin-top:5px;"><button id="btnReview">리뷰 등록</button></div>
 </body>
 </html>
 

@@ -2,6 +2,8 @@ package mybnb;
 
 import javax.persistence.*;
 import org.springframework.beans.BeanUtils;
+
+import java.net.ConnectException;
 import java.util.List;
 
 @Entity
@@ -97,9 +99,14 @@ public class Booking {
             payment.setAddress(getAddress());
             payment.setUsedate(getUsedate());
             payment.setStatus("PayApproved");
+
             // mappings goes here
-            BookingApplication.applicationContext.getBean(mybnb.external.PaymentService.class)
-                    .pay(payment);
+            try {
+                BookingApplication.applicationContext.getBean(mybnb.external.PaymentService.class)
+                        .pay(payment);
+            }catch(Exception e) {
+                throw new RuntimeException("결제서비스 호출 실패입니다.");
+            }
         }
         
         // 결제까지 완료되면 최종적으로 예약 완료 이벤트 발생

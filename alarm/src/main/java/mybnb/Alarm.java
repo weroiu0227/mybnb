@@ -37,7 +37,4 @@ public class Alarm {
         this.message = message;
     }
 
-
-
-
 }

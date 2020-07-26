@@ -4,10 +4,12 @@ public class ReviewRegistered extends AbstractEvent {
 
     private Long id;
     private Long bookId;
-    private Long guestId;
     private Long roomId;
+    private String name;
+    private String host;
+    private String guest;
+    private String usedate;
     private Integer score;
-    private String content;
     private String status;
 
     public Long getId() {
@@ -17,6 +19,7 @@ public class ReviewRegistered extends AbstractEvent {
     public void setId(Long id) {
         this.id = id;
     }
+
     public Long getBookId() {
         return bookId;
     }
@@ -24,13 +27,7 @@ public class ReviewRegistered extends AbstractEvent {
     public void setBookId(Long bookId) {
         this.bookId = bookId;
     }
-    public Long getGuestId() {
-        return guestId;
-    }
 
-    public void setGuestId(Long guestId) {
-        this.guestId = guestId;
-    }
     public Long getRoomId() {
         return roomId;
     }
@@ -38,6 +35,39 @@ public class ReviewRegistered extends AbstractEvent {
     public void setRoomId(Long roomId) {
         this.roomId = roomId;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public String getGuest() {
+        return guest;
+    }
+
+    public void setGuest(String guest) {
+        this.guest = guest;
+    }
+
+    public String getUsedate() {
+        return usedate;
+    }
+
+    public void setUsedate(String usedate) {
+        this.usedate = usedate;
+    }
+
     public Integer getScore() {
         return score;
     }
@@ -45,13 +75,7 @@ public class ReviewRegistered extends AbstractEvent {
     public void setScore(Integer score) {
         this.score = score;
     }
-    public String getContent() {
-        return content;
-    }
 
-    public void setContent(String content) {
-        this.content = content;
-    }
     public String getStatus() {
         return status;
     }

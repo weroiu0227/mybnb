@@ -21,7 +21,8 @@ public class PolicyHandler{
 
         if(payApproved.isMe()){
             //System.out.println("##### listener Notify : " + payApproved.toJson());
-            addNotificationHistory(payApproved.getGuestId(), "PayApproved");
+            addNotificationHistory("(guest)" + payApproved.getGuest(), "PayApproved");
+            addNotificationHistory("(host)" + payApproved.getHost(), "PayApproved");
         }
     }
     @StreamListener(KafkaProcessor.INPUT)
@@ -29,7 +30,8 @@ public class PolicyHandler{
 
         if(payCanceled.isMe()){
             //System.out.println("##### listener Notify : " + payCanceled.toJson());
-            addNotificationHistory(payCanceled.getGuestId(), "PayCanceled");
+            addNotificationHistory("(guest)" + payCanceled.getGuest(), "PayCanceled");
+            addNotificationHistory("(host)" + payCanceled.getHost(), "PayCanceled");
         }
     }
     @StreamListener(KafkaProcessor.INPUT)
@@ -37,7 +39,8 @@ public class PolicyHandler{
 
         if(booked.isMe()){
             //System.out.println("##### listener Notify : " + booked.toJson());
-            addNotificationHistory(booked.getGuestId(), "Booked");
+            addNotificationHistory("(guest)" + booked.getGuest(), "Booked");
+            addNotificationHistory("(host)" + booked.getHost(), "Booked");
         }
     }
     @StreamListener(KafkaProcessor.INPUT)
@@ -45,7 +48,8 @@ public class PolicyHandler{
 
         if(bookCanceled.isMe()){
             //System.out.println("##### listener Notify : " + bookCanceled.toJson());
-            addNotificationHistory(bookCanceled.getGuestId(), "BookCanceled");
+            addNotificationHistory("(guest)" + bookCanceled.getGuest(), "BookCanceled");
+            addNotificationHistory("(host)" + bookCanceled.getHost(), "BookCanceled");
         }
     }
     @StreamListener(KafkaProcessor.INPUT)
@@ -53,11 +57,11 @@ public class PolicyHandler{
 
         if(reviewRegistered.isMe()){
             //System.out.println("##### listener Notify : " + reviewRegistered.toJson());
-            addNotificationHistory(reviewRegistered.getGuestId(), "ReviewRegistered");
+            addNotificationHistory("(host)" + reviewRegistered.getHost(), "ReviewRegistered");
         }
     }
 
-    private void addNotificationHistory(long receiver, String message) {
+    private void addNotificationHistory(String receiver, String message) {
         Alarm history = new Alarm();
         history.setReceiver(String.valueOf(receiver));
         history.setMessage(message);

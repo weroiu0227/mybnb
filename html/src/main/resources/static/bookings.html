@@ -58,7 +58,7 @@
             },
             error: function (status) {
                 $('#tblBookings > tbody:last-child')
-                    .append($('<tr>').attr('style', 'text-align:center;')
+                    .append($('<tr>').attr('style', 'text-align:center; color:red;')
                         .append($('<td>').attr('colspan', '9').text('조회 실패'))
                     );
              }
@@ -99,6 +99,8 @@
 <a href="bookings.html">예약현황</a>
 <a href="payments.html">결제이력</a>
 <a href="mypages.html">마이페이지</a>
+<a href="reviews.html">리뷰이력</a>
+<a href="alarms.html">알림이력</a>
 
 <h2>예약현황</h2>
 <div style="width:100%; text-align:right;"><button id="btnBookings">새로고침</button></div>

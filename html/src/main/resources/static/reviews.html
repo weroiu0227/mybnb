@@ -7,57 +7,56 @@
     <script type="text/javascript">
 
     jQuery(document).ready(function(){
-        loadPayments();
+        loadReviews();
 
-        $("#btnPayments").click(function() {
-            loadPayments();
+        $("#btnReviews").click(function() {
+            loadReviews();
         });
     });
 
-    function loadPayments() {
-        $('#tblPayments tbody').empty();
+    function loadReviews() {
+        $('#tblReviews tbody').empty();
 
         $.ajax({
             type: "GET",
             contentType: "application/json",
             dataType: 'json',
-            url: "/payments",
+            url: "/reviews",
             success: function(result){
                 console.log(result);
-                var payments = result._embedded.payments;
+                var reviews = result._embedded.reviews;
 
-                if(payments.length < 1 ){
-                    $('#tblPayments > tbody:last-child')
+                if(reviews.length < 1 ){
+                    $('#tblReviews > tbody:last-child')
                         .append($('<tr>').attr('style', 'text-align:center;')
                             .append($('<td>').attr('colspan', '10').text('NO DATA'))
                         );
                 }
                 else {
-                    for(var i=0; i<payments.length; i++){
-                        var payment = payments[i];
-                        var paymenthref = payment._links.payment.href;
+                    for(var i=0; i<reviews.length; i++){
+                        var review = reviews[i];
+                        var reviewhref = review._links.review.href;
 
-                        var tmp = paymenthref.split("/");
-                        var paymentId = tmp[tmp.length-1];
+                        var tmp = reviewhref.split("/");
+                        var reviewId = tmp[tmp.length-1];
 
-                        $('#tblPayments > tbody:last-child')
+                        $('#tblReviews > tbody:last-child')
                             .append($('<tr>').attr('style', 'text-align:center;')
-                                .append($('<td>').text(paymentId))
-                                .append($('<td>').text(payment.status))
-                                .append($('<td>').text(payment.bookId))
-                                .append($('<td>').text(payment.guest))
-                                .append($('<td>').text(payment.usedate))
-                                .append($('<td>').text(payment.roomId))
-                                .append($('<td>').text(payment.name + ""))
-                                .append($('<td>').text(payment.price))
-                                .append($('<td>').text(payment.address))
-                                .append($('<td>').text(payment.host))
+                                .append($('<td>').text(reviewId))
+                                .append($('<td>').text(review.score))
+                                .append($('<td>').text(review.content))
+                                .append($('<td>').text(review.bookId))
+                                .append($('<td>').text(review.guest))
+                                .append($('<td>').text(review.usedate))
+                                .append($('<td>').text(review.roomId))
+                                .append($('<td>').text(review.name + ""))
+                                .append($('<td>').text(review.host))
                             );
                     }
                 }
             },
             error: function (status) {
-                $('#tblPayments > tbody:last-child')
+                $('#tblReviews > tbody:last-child')
                     .append($('<tr>').attr('style', 'text-align:center; color:red;')
                         .append($('<td>').attr('colspan', '10').text('조회 실패'))
                     );
@@ -77,20 +76,19 @@
 <a href="reviews.html">리뷰이력</a>
 <a href="alarms.html">알림이력</a>
 
-<h2>결제이력</h2>
-<div style="width:100%; text-align:right;"><button id="btnPayments">새로고침</button></div>
-<table id="tblPayments" style="width: 100%; border:1px solid black; margin-top:5px;">
+<h2>리뷰이력</h2>
+<div style="width:100%; text-align:right;"><button id="btnReviews">새로고침</button></div>
+<table id="tblReviews" style="width: 100%; border:1px solid black; margin-top:5px;">
     <thead>
     <tr>
         <th>ID</th>
-        <th>상태</th>
+        <th>점수</th>
+        <th>내용</th>
         <th>예약 ID</th>
         <th>예약자</th>
         <th>예약일자</th>
         <th>숙소 ID</th>
         <th>숙소 이름</th>
-        <th>숙소 가격</th>
-        <th>숙소 주소</th>
         <th>숙소 호스트</th>
     </tr>
     </thead>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Mybnb.com (공유 숙소 서비스 따라하기)</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <script type="text/javascript">
+
+    jQuery(document).ready(function(){
+        loadPayments();
+
+        $("#btnPayments").click(function() {
+            loadPayments();
+        });
+    });
+
+    function loadPayments() {
+        $('#tblPayments tbody').empty();
+
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            dataType: 'json',
+            url: "/payments",
+            success: function(result){
+                console.log(result);
+                var payments = result._embedded.payments;
+
+                if(payments.length < 1 ){
+                    $('#tblPayments > tbody:last-child')
+                        .append($('<tr>').attr('style', 'text-align:center;')
+                            .append($('<td>').attr('colspan', '10').text('NO DATA'))
+                        );
+                }
+                else {
+                    for(var i=0; i<payments.length; i++){
+                        var payment = payments[i];
+                        var paymenthref = payment._links.payment.href;
+
+                        var tmp = paymenthref.split("/");
+                        var paymentId = tmp[tmp.length-1];
+
+                        $('#tblPayments > tbody:last-child')
+                            .append($('<tr>').attr('style', 'text-align:center;')
+                                .append($('<td>').text(paymentId))
+                                .append($('<td>').text(payment.status))
+                                .append($('<td>').text(payment.bookId))
+                                .append($('<td>').text(payment.guest))
+                                .append($('<td>').text(payment.usedate))
+                                .append($('<td>').text(payment.roomId))
+                                .append($('<td>').text(payment.name + ""))
+                                .append($('<td>').text(payment.price))
+                                .append($('<td>').text(payment.address))
+                                .append($('<td>').text(payment.host))
+                            );
+                    }
+                }
+            },
+            error: function (status) {
+                $('#tblPayments > tbody:last-child')
+                    .append($('<tr>').attr('style', 'text-align:center;')
+                        .append($('<td>').attr('colspan', '10').text('조회 실패'))
+                    );
+             }
+        });
+    }
+
+    </script>
+
+</head>
+<body>
+<h1><a href="index.html">Mybnb.com (공유 숙소 서비스 따라하기)</a></h1>
+<a href="rooms.html">숙소관리</a>
+<a href="bookings.html">예약현황</a>
+<a href="payments.html">결제이력</a>
+<a href="mypages.html">마이페이지</a>
+
+<h2>결제이력</h2>
+<div style="width:100%; text-align:right;"><button id="btnPayments">새로고침</button></div>
+<table id="tblPayments" style="width: 100%; border:1px solid black; margin-top:5px;">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>상태</th>
+        <th>예약 ID</th>
+        <th>예약자</th>
+        <th>예약일자</th>
+        <th>숙소 ID</th>
+        <th>숙소 이름</th>
+        <th>숙소 가격</th>
+        <th>숙소 주소</th>
+        <th>숙소 호스트</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+</body>
+</html>
+

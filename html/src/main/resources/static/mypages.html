@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Mybnb.com (공유 숙소 서비스 따라하기)</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <script type="text/javascript">
+
+    jQuery(document).ready(function(){
+        loadMypages();
+
+        $("#btnMypagess").click(function() {
+            loadMypages();
+        });
+    });
+
+    function loadMypages() {
+        $('#tblMypagess tbody').empty();
+
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            dataType: 'json',
+            url: "/mypages",
+            success: function(result){
+                console.log(result);
+                //var totalcnt = result.page.totalElements;
+                var mypages = result._embedded.mypages;
+
+                if(mypages.length < 1 ){
+                    $('#tblMypages > tbody:last-child')
+                        .append($('<tr>').attr('style', 'text-align:center;')
+                            .append($('<td>').attr('colspan', '11').text('NO DATA'))
+                        );
+                }
+                else {
+                    for(var i=0; i<mypages.length; i++){
+                        var mypage = mypages[i];
+                        var mypagehref = mypage._links.mypage.href;
+
+                        var tmp = mypagehref.split("/");
+                        var mypageId = tmp[tmp.length-1];
+
+                        $('#tblMypages > tbody:last-child')
+                            .append($('<tr>').attr('style', 'text-align:center;')
+                                .append($('<td>').text(mypageId))
+                                .append($('<td>').text(mypage.status))
+                                .append($('<td>').text(mypage.score == null ? "-" : mypage.score))
+                                .append($('<td>').text(mypage.bookId))
+                                .append($('<td>').text(mypage.guest))
+                                .append($('<td>').text(mypage.usedate))
+                                .append($('<td>').text(mypage.roomId))
+                                .append($('<td>').text(mypage.name + ""))
+                                .append($('<td>').text(mypage.price))
+                                .append($('<td>').text(mypage.address))
+                                .append($('<td>').text(mypage.host))
+                            );
+                    }
+                }
+            },
+            error: function (status) {
+                $('#tblMypages > tbody:last-child')
+                    .append($('<tr>').attr('style', 'text-align:center;')
+                        .append($('<td>').attr('colspan', '11').text('조회 실패'))
+                    );
+             }
+        });
+    }
+    </script>
+
+</head>
+<body>
+<h1><a href="index.html">Mybnb.com (공유 숙소 서비스 따라하기)</a></h1>
+<a href="rooms.html">숙소관리</a>
+<a href="bookings.html">예약현황</a>
+<a href="payments.html">결제이력</a>
+<a href="mypages.html">마이페이지</a>
+
+<h2>마이페이지</h2>
+<div style="width:100%; text-align:right;"><button id="btnMypages">새로고침</button></div>
+<table id="tblMypages" style="width: 100%; border:1px solid black; margin-top:5px;">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>상태</th>
+        <th>평점</th>
+        <th>예약 ID</th>
+        <th>예약자</th>
+        <th>예약일자</th>
+        <th>숙소 ID</th>
+        <th>숙소 이름</th>
+        <th>숙소 가격</th>
+        <th>숙소 주소</th>
+        <th>숙소 호스트</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+</body>
+</html>
+

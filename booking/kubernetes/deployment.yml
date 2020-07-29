@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: booking
-          image: jihwancha/booking:latest
+          image: jihwancha/mybnb-booking:latest
           ports:
             - containerPort: 8080
           readinessProbe:

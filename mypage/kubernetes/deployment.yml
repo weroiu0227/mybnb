@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: mypage
-          image: jihwancha/mypage:latest
+          image: jihwancha/mybnb-mypage:latest
           ports:
             - containerPort: 8080
           readinessProbe:

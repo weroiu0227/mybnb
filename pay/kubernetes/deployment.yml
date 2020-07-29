@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: pay
-          image: jihwancha/pay:latest
+          image: jihwancha/mybnb-pay:latest
           ports:
             - containerPort: 8080
           readinessProbe:

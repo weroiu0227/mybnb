@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: alarm
+  name: html
   labels:
-    app: alarm
+    app: html
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: alarm
+      app: html
   template:
     metadata:
       labels:
-        app: alarm
+        app: html
     spec:
       containers:
-        - name: alarm
-          image: jihwancha/mybnb-alarm:latest
+        - name: html
+          image: jihwancha/mybnb-html:latest
           ports:
             - containerPort: 8080
           readinessProbe:

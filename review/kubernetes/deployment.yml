@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: review
-          image: jihwancha/review:latest
+          image: jihwancha/mybnb-review:latest
           ports:
             - containerPort: 8080
           readinessProbe:

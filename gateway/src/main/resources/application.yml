@@ -47,6 +47,11 @@ spring:
               - "*"
             allowCredentials: true
 
+logging:
+  level:
+    org.hibernate.type: trace
+    org.springframework.cloud: debug
+
 ---
 
 spring:

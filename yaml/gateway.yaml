@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gateway
+  namespace: mybnb
   labels:
     app: gateway
 spec:
@@ -19,22 +20,6 @@ spec:
           image: jihwancha/mybnb-gateway:latest
           ports:
             - containerPort: 8080
-          readinessProbe:
-            httpGet:
-              path: '/actuator/health'
-              port: 8080
-            initialDelaySeconds: 10
-            timeoutSeconds: 2
-            periodSeconds: 5
-            failureThreshold: 10
-          livenessProbe:
-            httpGet:
-              path: '/actuator/health'
-              port: 8080
-            initialDelaySeconds: 120
-            timeoutSeconds: 2
-            periodSeconds: 5
-            failureThreshold: 5
 
 ---
 
@@ -42,6 +27,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: gateway
+  namespace: mybnb
   labels:
     app: gateway
 spec:
@@ -50,4 +36,4 @@ spec:
       targetPort: 8080
   selector:
     app: gateway
-  type: LoadBalancer
+  type: ClusterIP

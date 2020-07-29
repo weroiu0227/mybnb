@@ -52,7 +52,7 @@
                                 .append($('<td>').text(booking.price))
                                 .append($('<td>').text(booking.address))
                                 .append($('<td>').text(booking.host))
-                                .append($('<td>').append($('<a>').attr('href', "javascript:deleteBooking('"+bookingId+"')").text('취소하기')))
+                                .append($('<td>').append($('<a>').attr({class: 'Button bg-red', href: "javascript:deleteBooking('"+bookingId+"')"}).text('취소하기')))
                             );
                     }
                 }

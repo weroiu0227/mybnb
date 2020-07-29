@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: booking
+  namespace: mybnb
   labels:
     app: booking
 spec:
@@ -42,6 +43,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: booking
+  namespace: mybnb
   labels:
     app: booking
 spec:

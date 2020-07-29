@@ -55,7 +55,7 @@
                                 .append($('<td>').text(mypage.price))
                                 .append($('<td>').text(mypage.address))
                                 .append($('<td>').text(mypage.host))
-                                .append($('<td>').append($('<a>').attr('href', "javascript:openReviewAddView('"+mypage.status+"','"+mypage.bookId+"')").text('리뷰작성')))
+                                .append($('<td>').append($('<a>').attr({class: 'Button bg-red', href: "javascript:openReviewAddView('"+mypage.status+"','"+mypage.bookId+"')"}).text('리뷰작성')))
                             );
                     }
                 }

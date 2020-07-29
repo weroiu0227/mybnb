@@ -108,6 +108,13 @@ public class Payment {
             BeanUtils.copyProperties(this, payApproved);
             payApproved.setStatus(getStatus());
             payApproved.publishAfterCommit();
+
+            // 결제이력을 저장한 후 적당한 시간 끌기
+            try {
+                Thread.currentThread().sleep((long) (400 + Math.random() * 220));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         else if("PayCanceled".equals(getStatus())) {
             PayCanceled payCanceled = new PayCanceled();

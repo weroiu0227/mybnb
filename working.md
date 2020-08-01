@@ -200,7 +200,7 @@ http POST http://booking:8080/bookings roomId=1 name=호텔 price=1000 address=�
 
 # 예약 부하 발생 (siege 에서)
 <pre>
-siege -v -c100 -t60S -r10 --content-type "application/json" 'http://booking:8080/bookings POST {"roomId":1, "name":호텔, "price":1000, "address":서울, "host":Superman, "guest":배트맨, "usedate":20201230}'
+siege -v -c100 -t60S -r10 --content-type "application/json" 'http://booking:8080/bookings POST {"roomId":1, "name":"호텔", "price":1000, "address":"서울", "host":"Superman", "guest":"배트맨", "usedate":"20201230"}'
 </pre>
 
 # kiali 확인

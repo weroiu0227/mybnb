@@ -144,6 +144,12 @@ apt-get update
 apt-get install httpie
 </pre>
 
+# ECR image repository 
+<pre>
+aws ecr create-repository --repository-name mybnb-htm --region ap-northeast-2
+...
+</pre>
+
 # image build & push
 <pre>
 cd mybnb/html

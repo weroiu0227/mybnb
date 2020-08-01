@@ -21,7 +21,7 @@ aws configure
 </pre>
 - Access Key ID : 
 - Secret Access Key : 
-- Region : ap-northeast-2
+- Region : ap-northeast-2 (리전입력)
 - Default output format : json
 
 # EKS Client (eksctl) 설치
@@ -32,12 +32,12 @@ sudo mv /tmp/eksctl /usr/local/bin
 
 # EKS Cluster create
 <pre>
-eksctl create cluster --name jihwancha-cluster --version 1.15 --nodegroup-name standard-workers --node-type t3.medium --nodes 2 --nodes-min 1 --nodes-max 3
+eksctl create cluster --name (클러스터명) --version 1.15 --nodegroup-name standard-workers --node-type t3.medium --nodes 2 --nodes-min 1 --nodes-max 3
 </pre>
 
 # EKS Cluster settings
 <pre>
-aws eks --region ap-northeast-2 update-kubeconfig --name jihwancha-cluster
+aws eks --region ap-northeast-2 update-kubeconfig --name (클러스터명)
 kubectl config current-context
 kubectl get all
 </pre>
@@ -49,12 +49,12 @@ aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS
 </pre>
 - 오류(unknown flag: --password-stdin) 발생 시,
 </pre>
-docker login --username AWS -p $(aws ecr get-login-password --region ca-central-1) 052937454741.dkr.ecr.ca-central-1.amazonaws.com/
+docker login --username AWS -p $(aws ecr get-login-password --region ap-northeast-2) (Account-ID).dkr.ecr.ap-northeast-2.amazonaws.com/
 </pre>
 
 # EKS Cluster delete
 <pre>
-eksctl delete cluster --name jihwancha-cluster
+eksctl delete cluster --name (클러스터명)
 </pre>
 
 # Metric Server 설치

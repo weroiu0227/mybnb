@@ -151,8 +151,21 @@ aws ecr create-repository --repository-name mybnb-htm --region ap-northeast-2
 </pre>
 
 # image build & push
+
+- compile
 <pre>
 cd mybnb/html
+mvn package
+</pre>
+- for aws ecr
+<pre>
+docker build -t [AWS_ACCOUNT_ID].dkr.ecr.ap-northeast-2.amazonaws.com/mybnb-html:v1 .
+docker push [AWS_ACCOUNT_ID].dkr.ecr.ap-northeast-2.amazonaws.com/mybnb-html:v1
+
+...
+</pre>
+- for dockerhub
+<pre>
 docker build -t jihwancha/mybnb-html:v1 .
 docker push jihwancha/mybnb-html:v1
 

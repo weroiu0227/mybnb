@@ -48,7 +48,7 @@ kubectl get all
 aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin (Account-ID).dkr.ecr.ap-northeast-2.amazonaws.com
 </pre>
 - 오류(unknown flag: --password-stdin) 발생 시,
-</pre>
+<pre>
 docker login --username AWS -p $(aws ecr get-login-password --region ap-northeast-2) (Account-ID).dkr.ecr.ap-northeast-2.amazonaws.com/
 </pre>
 

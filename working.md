@@ -188,19 +188,19 @@ kubectl apply -f review.yaml
 
 # 숙소 등록 (siege 에서)
 <pre>
-http POST http://room:8080/rooms name=“호텔” price=1000 address=“서울” host=“Superman”
-http POST http://room:8080/rooms name=“펜션” price=1000 address=“양평” host=“Superman”
-http POST http://room:8080/rooms name=“민박” price=1000 address=“강릉” host=“Superman”
+http POST http://room:8080/rooms name=호텔 price=1000 address=서울 host=Superman
+http POST http://room:8080/rooms name=펜션 price=1000 address=양평 host=Superman
+http POST http://room:8080/rooms name=민박 price=1000 address=강릉 host=Superman
 </pre>
 
 # 예약 (siege 에서)
 <pre>
-http POST http://booking:8080/bookings roomId=1 name=“호텔” price=1000 address=“서울” host=“Superman” guest=“배트맨” usedate=“20201010”
+http POST http://booking:8080/bookings roomId=1 name=호텔 price=1000 address=서울 host=Superman guest=배트맨 usedate=20201010
 </pre>
 
 # 예약 부하 발생 (siege 에서)
 <pre>
-siege -v -c100 -t60S -r10 --content-type "application/json" 'http://booking:8080/bookings POST {"roomId":1, "name":"호텔", "price":1000, "address":"서울", "host":"Superman", "guest":"배트맨”, “usedate”:”20201230”}'
+siege -v -c100 -t60S -r10 --content-type "application/json" 'http://booking:8080/bookings POST {"roomId":1, "name":호텔, "price":1000, "address":서울, "host":Superman, "guest":배트맨, "usedate":20201230}'
 </pre>
 
 # kiali 확인

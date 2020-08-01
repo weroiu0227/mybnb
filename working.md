@@ -1,13 +1,35 @@
 # Kubectl install
+<pre>
+sudo apt-get update && sudo apt-get install -y apt-transport-https
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
+sudo apt-get update
+sudo apt-get install -y kubectl
+</pre>
 
 # AWS-Cli v2 install
+<pre>
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+(unzip이 없을 경우, 설치) sudo apt-get install unzip
+sudo ./aws/install
+</pre>
 
 # AWS Configure
+<pre>
+aws configure
+</pre>
 - Access Key ID : 
 - Secret Access Key : 
 - Region : ap-northeast-2
 - Default output format : json
- 
+
+# EKS Client (eksctl) 설치
+<pre>
+curl --location "https://github.com/weaveworks/eksctl/releases/download/latest_release/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+sudo mv /tmp/eksctl /usr/local/bin
+</pre>
+
 # EKS Cluster create
 <pre>
 eksctl create cluster --name jihwancha-cluster --version 1.15 --nodegroup-name standard-workers --node-type t3.medium --nodes 2 --nodes-min 1 --nodes-max 3
@@ -21,8 +43,14 @@ kubectl get all
 </pre>
 
 # ECR 인증
-- Dockerhub 사용으로 진행할 필요 없음
-
+- Dockerhub 사용하는 경우 진행할 필요 없음
+<pre>
+aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin (Account-ID).dkr.ecr.ap-northeast-2.amazonaws.com
+</pre>
+- 오류(unknown flag: --password-stdin) 발생 시,
+</pre>
+docker login --username AWS -p $(aws ecr get-login-password --region ca-central-1) 052937454741.dkr.ecr.ca-central-1.amazonaws.com/
+</pre>
 
 # EKS Cluster delete
 <pre>

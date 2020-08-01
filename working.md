@@ -146,28 +146,27 @@ apt-get install httpie
 
 # ECR image repository 
 <pre>
-aws ecr create-repository --repository-name mybnb-htm --region ap-northeast-2
-...
+aws ecr create-repository --repository-name mybnb-gateway --region ap-northeast-2
 </pre>
 
 # image build & push
 
 - compile
 <pre>
-cd mybnb/html
+cd mybnb/gateway
 mvn package
 </pre>
 - for aws ecr
 <pre>
-docker build -t [AWS_ACCOUNT_ID].dkr.ecr.ap-northeast-2.amazonaws.com/mybnb-html:v1 .
-docker push [AWS_ACCOUNT_ID].dkr.ecr.ap-northeast-2.amazonaws.com/mybnb-html:v1
+docker build -t [AWS_ACCOUNT_ID].dkr.ecr.ap-northeast-2.amazonaws.com/mybnb-gateway:latest .
+docker push [AWS_ACCOUNT_ID].dkr.ecr.ap-northeast-2.amazonaws.com/mybnb-gateway:latest
 
 ...
 </pre>
 - for dockerhub
 <pre>
-docker build -t jihwancha/mybnb-html:v1 .
-docker push jihwancha/mybnb-html:v1
+docker build -t jihwancha/mybnb-html:latest .
+docker push jihwancha/mybnb-html:latest
 
 ...
 </pre>

@@ -175,6 +175,8 @@ docker push jihwancha/mybnb-html:latest
 <pre>
 cd mybnb/yaml
 
+kubectl apply -f configmap.yaml
+
 kubectl apply -f gateway.yaml
 kubectl apply -f html.yaml
 kubectl apply -f room.yaml

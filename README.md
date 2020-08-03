@@ -74,7 +74,6 @@ Airbnb 와 같은 숙박 공유 서비스입니다.
 1. 예약취소됨
 1. 결제취소됨
 1. 후기등록됨
-1. 마일리지적립됨
 
 ### 부적격 이벤트 탈락
 1. 숙소등록됨
@@ -88,24 +87,23 @@ Airbnb 와 같은 숙박 공유 서비스입니다.
 1. 예약취소됨
 1. 결제취소됨
 1. 후기등록됨
-1. 마일리지적립됨
 
 * 과정중 도출된 잘못된 도메인 이벤트들을 걸러내는 작업을 수행함
-  1. 숙소검색됨, 예약정보조회됨 :  UI 의 이벤트이지, 업무적인 의미의 이벤트가 아니라서 제외
-  1. 알림전달됨 :  해당 업무내에서 꼭 처리해야하는 기능이지만, 업무적으로 의미있게 공유할 이벤트가 아니라서 제외
+  - 숙소검색됨, 예약정보조회됨 :  UI 의 이벤트이지, 업무적인 의미의 이벤트가 아니라서 제외
+  - 알림전달됨 :  해당 업무내에서 꼭 처리해야하는 기능이지만, 업무적으로 의미있게 공유할 이벤트가 아니라서 제외
 
 ### 액터, 커맨드 부착하여 읽기 좋게
 
 ### 어그리게잇으로 묶기
 
-  * 숙소의 숙소관리, 예약의 예약관리, 결제의 결제이력, 후기의 후기관리, 마일리지의 마일리지관리는 그와 연결된 command 와 event 들에 의하여 트랜잭션이 유지되어야 하는 단위로 그들 끼리 묶어줌
+  * 숙소의 숙소관리, 예약의 예약관리, 결제의 결제이력, 알림의 알림이력, 후기의 후기관리, 마이페이지는 그와 연결된 command 와 event 들에 의하여 트랜잭션이 유지되어야 하는 단위로 그들 끼리 묶어줌
 
 ### 바운디드 컨텍스트로 묶기
 
-  * 도메인 서열 분리 
-        - Core Domain:   숙소, 예약 : 없어서는 안될 핵심 서비스이며, 연견 Up-time SLA 수준을 99.999% 목표, 배포주기는 app 의 경우 1주일 1회 미만, store 의 경우 1개월 1회 미만
-        - Supporting Domain:   후기, 마일리지 : 경쟁력을 내기위한 서비스이며, SLA 수준은 연간 60% 이상 uptime 목표, 배포주기는 각 팀의 자율이나 표준 스프린트 주기가 1주일 이므로 1주일 1회 이상을 기준으로 함.
-        - General Domain:   결제 : 결제서비스로 3rd Party 외부 서비스를 사용하는 것이 경쟁력이 높음 (핑크색으로 이후 전환할 예정)
+* 도메인 서열 분리 
+  - Core Domain:   숙소, 예약 : 없어서는 안될 핵심 서비스이며, 연견 Up-time SLA 수준을 99.999% 목표, 배포주기는 app 의 경우 1주일 1회 미만, store 의 경우 1개월 1회 미만
+  - Supporting Domain:   후기,  : 경쟁력을 내기위한 서비스이며, SLA 수준은 연간 60% 이상 uptime 목표, 배포주기는 각 팀의 자율이나 표준 스프린트 주기가 1주일 이므로 1주일 1회 이상을 기준으로 함.
+  - General Domain:   결제 : 결제서비스로 3rd Party 외부 서비스를 사용하는 것이 경쟁력이 높음 (핑크색으로 이후 전환할 예정)
 
 ### 폴리시 부착 (괄호는 수행주체, 폴리시 부착을 둘째단계에서 해놔도 상관 없음. 전체 연계가 초기에 드러남)
 
@@ -133,22 +131,22 @@ Airbnb 와 같은 숙박 공유 서비스입니다.
 ### 비기능 요구사항 검증
 
   * 마이크로 서비스를 넘나드는 시나리오에 대한 트랜잭션 처리
-        - 숙소 예약시 결제처리:  결제가 완료되지 않은 예약은 절대 받지 않는다에 따라, ACID 트랜잭션 적용. 예약 완료시 결제처리에 대해서는 Request-Response 방식 처리
-        - 예약 완료시 알림 처리 :  예약에서 알림 마이크로서비스로 예약 완료 내용을 전달되는 과정에 있어서 알림 마이크로서비스가 별도의 배포주기를 가지기 때문에 Eventual Consistency 방식으로 트랜잭션 처리함.
-        - 나머지 모든 inter-microservice 트랜잭션: 예약상태, 예약취소 등 모든 이벤트에 대해 알림 처리하는 등, 데이터 일관성의 시점이 크리티컬하지 않은 모든 경우가 대부분이라 판단, Eventual Consistency 를 기본으로 채택함.
+    - 숙소 예약시 결제처리:  결제가 완료되지 않은 예약은 절대 받지 않는다에 따라, ACID 트랜잭션 적용. 예약 완료시 결제처리에 대해서는 Request-Response 방식 처리
+    - 예약 완료시 알림 처리:  예약에서 알림 마이크로서비스로 예약 완료 내용을 전달되는 과정에 있어서 알림 마이크로서비스가 별도의 배포주기를 가지기 때문에 Eventual Consistency 방식으로 트랜잭션 처리함.
+    - 나머지 모든 inter-microservice 트랜잭션: 예약상태, 예약취소 등 모든 이벤트에 대해 알림 처리하는 등, 데이터 일관성의 시점이 크리티컬하지 않은 모든 경우가 대부분이라 판단, Eventual Consistency 를 기본으로 채택함.
 
 ## 헥사고날 아키텍처 다이어그램 도출
     
 ![image](https://user-images.githubusercontent.com/487999/79684772-eba9ab00-826e-11ea-9405-17e2bf39ec76.png)
 
-    - Chris Richardson, MSA Patterns 참고하여 Inbound adaptor와 Outbound adaptor를 구분함
-    - 호출관계에서 PubSub 과 Req/Resp 를 구분함
-    - 서브 도메인과 바운디드 컨텍스트의 분리:  각 팀의 KPI 별로 아래와 같이 관심 구현 스토리를 나눠가짐
+  * Chris Richardson, MSA Patterns 참고하여 Inbound adaptor와 Outbound adaptor를 구분함
+  * 호출관계에서 PubSub 과 Req/Resp 를 구분함
+  * 서브 도메인과 바운디드 컨텍스트의 분리:  각 팀의 KPI 별로 아래와 같이 관심 구현 스토리를 나눠가짐
 
 
 # 구현:
 
-분석/설계 단계에서 도출된 헥사고날 아키텍처에 따라, 각 BC별로 대변되는 마이크로 서비스들을 스프링부트와 파이선으로 구현하였다. 구현한 각 서비스를 로컬에서 실행하는 방법은 아래와 같다 (각자의 포트넘버는 8081 ~ 808n 이다)
+분석/설계 단계에서 도출된 헥사고날 아키텍처에 따라, 각 BC별로 대변되는 마이크로 서비스들을 스프링부트로 구현하였다. 구현한 각 서비스를 로컬에서 실행하는 방법은 아래와 같다 (각자의 포트넘버는 8081 ~ 808n 이다)
 
 ```
 cd 숙소
@@ -160,13 +158,21 @@ mvn spring-boot:run
 cd 결제
 mvn spring-boot:run  
 
+cd 마이페이지
+mvn spring-boot:run
+
 cd 알림
+mvn spring-boot:run
+
+cd 후기
 mvn spring-boot:run
 ```
 
 ## DDD 의 적용
 
-- 각 서비스내에 도출된 핵심 Aggregate Root 객체를 Entity 로 선언하였다: (예시는 결제 마이크로서비스). 이때 가능한 현업에서 사용하는 언어 (유비쿼터스 랭귀지)를 그대로 사용하려고 노력했다. 하지만, 일부 구현에 있어서 영문이 아닌 경우는 실행이 불가능한 경우가 있기 때문에 계속 사용할 방법은 아닌것 같다. (Maven pom.xml, Kafka의 topic id, FeignClient 의 서비스 id 등은 한글로 식별자를 사용하는 경우 오류가 발생하는 것을 확인하였다)
+* 각 서비스내에 도출된 핵심 Aggregate Root 객체를 Entity 로 선언하였다: (예시는 결제 마이크로서비스).
+  - 가능한 현업에서 사용하는 언어 (유비쿼터스 랭귀지)를 그대로 사용할 수 있지만, 일부 구현에 있어서 영문이 아닌 경우는 실행이 불가능한 경우가 있다 Maven pom.xml, Kafka의 topic id, FeignClient 의 서비스 id 등은 한글로 식별자를 사용하는 경우 오류가 발생하는 것을 확인하였다)
+  - 최종적으로는 모두 영문을 사용하였으며, 이는 잠재적인 오류 발생 가능성을 차단하고 향후 확장되는 다양한 서비스들 간에 영향도를 최소화하기 위함이다.
 
 ```
 package mybnb;
@@ -176,50 +182,102 @@ import org.springframework.beans.BeanUtils;
 import java.util.List;
 
 @Entity
-@Table(name="결제관리_table")
-public class 결제관리 {
+@Table(name="Payment_table")
+public class Payment {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
-    private Long 예약id;
-    private Long 게스트id;
-    private Long 숙소id;
-    private Long 금액;
+    private Long bookId;
+    private Long roomId;
+    private String name;
+    private Long price;
+    private String address;
+    private String host;
+    private String guest;
+    private String usedate;
+    private String status;
 
     public Long getId() {
         return id;
     }
+
     public void setId(Long id) {
         this.id = id;
     }
-    public Long get예약id() {
-        return 예약id;
+
+    public Long getBookId() {
+        return bookId;
     }
-    public void set예약id(Long 예약id) {
-        this.예약id = 예약id;
+
+    public void setBookId(Long bookId) {
+        this.bookId = bookId;
     }
-    public Long get게스트id() {
-        return 게스트id;
+
+    public Long getRoomId() {
+        return roomId;
     }
-    public void set게스트id(Long 게스트id) {
-        this.게스트id = 게스트id;
+
+    public void setRoomId(Long roomId) {
+        this.roomId = roomId;
     }
-    public Long get숙소id() {
-        return 숙소id;
+
+    public String getName() {
+        return name;
     }
-    public void set숙소id(Long 숙소id) {
-        this.숙소id = 숙소id;
+
+    public void setName(String name) {
+        this.name = name;
     }
-    public Long get금액() {
-        return 금액;
+
+    public Long getPrice() {
+        return price;
     }
-    public void set금액(Long 금액) {
-        this.금액 = 금액;
+
+    public void setPrice(Long price) {
+        this.price = price;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public String getGuest() {
+        return guest;
+    }
+
+    public void setGuest(String guest) {
+        this.guest = guest;
+    }
+
+    public String getUsedate() {
+        return usedate;
+    }
+
+    public void setUsedate(String usedate) {
+        this.usedate = usedate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
-
-
 ```
 - Entity Pattern 과 Repository Pattern 을 적용하여 JPA 를 통하여 다양한 데이터소스 유형 (RDB or NoSQL) 에 대한 별도의 처리가 없도록 데이터 접근 어댑터를 자동 생성하기 위하여 Spring Data REST 의 RestRepository 를 적용하였다
 ```
@@ -227,24 +285,20 @@ package mybnb;
 
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface 결제관리Repository extends PagingAndSortingRepository<결제관리, Long>{
+public interface PaymentRepository extends PagingAndSortingRepository<Payment, Long>{
 
 }
 ```
 - 적용 후 REST API 의 테스트
 ```
 # 숙소 서비스의 등록처리
-http localhost:8081/숙소s room="풀빌라"
+http POST http://room:8080/rooms name=호텔 price=1000 address=서울 host=Superman
 
 # 예약 서비스의 예약처리
-http localhost:8082/예약s roomId=1 
-
-# 결제 서비스의 결제처리
-http localhost:8083/결제s 예약ID=1
+http POST http://booking:8080/bookings roomId=1 name=호텔 price=1000 address=서울 host=Superman guest=배트맨 usedate=20201010
 
 # 예약 상태 확인
-http localhost:8082/예약s/1
-
+http http://booking:8080/bookings/1
 ```
 
 ## 폴리글랏 퍼시스턴스
@@ -265,35 +319,52 @@ http localhost:8082/예약s/1
 - 결제 서비스를 호출하기 위하여 Stub과 (FeignClient) 를 이용하여 Service 대행 인터페이스 (Proxy) 를 구현 
 
 ```
-@FeignClient(name="결제", url="http://결제:8083")
-public interface 결제관리Service {
+@FeignClient(name="pay", url="${api.url.payment}")
+public interface PaymentService {
 
-    @RequestMapping(method= RequestMethod.POST, path="/결제관리s"))
-    public void 결제(@RequestBody 결제관리 결제관리);
+    @RequestMapping(method= RequestMethod.POST, path="/payments")
+    public void pay(@RequestBody Payment payment);
 
 }
-
 ```
 
 - 예약을 받은 직후(@PostPersist) 결제를 요청하도록 처리
 ```
 @Entity
-@Table(name="예약관리_table")
-public class 예약관리 {
+@Table(name="Booking_table")
+public class Booking {
+
+   ...
 
     @PostPersist
     public void onPostPersist(){
-        mybnb.external.결제관리 결제관리 = new mybnb.external.결제관리();
-        결제관리.set예약id(getId());
-        
-        예약Application.applicationContext.getBean(mybnb.external.결제관리Service.class)
-            .결제(결제관리);
+        // 예약시 결제까지 트랜잭션을 통합을 위해 결제 서비스 직접 호출
+        {
+            mybnb.external.Payment payment = new mybnb.external.Payment();
+            payment.setBookId(getId());
+            payment.setRoomId(getRoomId());
+            payment.setGuest(getGuest());
+            payment.setPrice(getPrice());
+            payment.setName(getName());
+            payment.setHost(getHost());
+            payment.setAddress(getAddress());
+            payment.setUsedate(getUsedate());
+            payment.setStatus("PayApproved");
+
+            // mappings goes here
+            try {
+                BookingApplication.applicationContext.getBean(mybnb.external.PaymentService.class)
+                        .pay(payment);
+            }catch(Exception e) {
+                throw new RuntimeException("결제서비스 호출 실패입니다.");
+            }
+        }
     }
+
+}
 ```
 
 - 동기식 호출에서는 호출 시간에 따른 타임 커플링이 발생하며, 결제 시스템이 장애가 나면 주문도 못받는다는 것을 확인:
-
-
 ```
 # 결제 서비스를 잠시 내려놓음 (ctrl+c)
 

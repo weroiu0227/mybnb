@@ -52,43 +52,35 @@ Airbnb 와 같은 숙박 공유 서비스입니다.
 
 # 분석/설계
 
+## AS-IS 조직 (Horizontally-Aligned)
+  ![image](https://user-images.githubusercontent.com/61722732/89151241-7b176780-d59b-11ea-84ae-ac62095c447e.JPG)
+
+## TO-BE 조직 (Vertically-Aligned)
+  ![image](https://user-images.githubusercontent.com/61722732/89151259-87032980-d59b-11ea-89a9-4f36f6807ab3.JPG)
+
 ## Event Storming 결과
 * MSAEz 로 모델링한 이벤트스토밍 결과 : http://msaez.io/#/storming/TWDBQXDzOJbymFE78o3DdlQ90XG3/mine/2f61f8e783098ff1c0846577ac58a501/-MCC6v6zjziZTBGEqE3Z
-![image](https://user-images.githubusercontent.com/61722732/87865276-127e9700-c9ae-11ea-8bd8-28b15c64805d.PNG)
 
 ### 이벤트 도출
-1. 숙소등록됨
-1. 숙소삭제됨
-1. 숙소검색됨
-1. 예약됨
-1. 결제승인됨
-1. 알림전달됨
-1. 예약정보조회됨
-1. 예약취소됨
-1. 결제취소됨
+  ![image](https://user-images.githubusercontent.com/61722732/89151292-9f734400-d59b-11ea-9de6-d58aa8226d47.JPG)
 
 ### 부적격 이벤트 탈락
-1. 숙소등록됨
-1. 숙소삭제됨
-1. 숙소검색됨 (X)
-1. 예약됨
-1. 결제승인됨
-1. 알림전달됨 (X)
-1. 예약정보조회됨 (X)
-1. 예약취소됨
-1. 결제취소됨
+  ![image](https://user-images.githubusercontent.com/61722732/89151319-b023ba00-d59b-11ea-89d9-cc9208ca5409.JPG)
 
 * 과정중 도출된 잘못된 도메인 이벤트들을 걸러내는 작업을 수행함
   - 숙소검색됨, 예약정보조회됨 :  UI 의 이벤트이지, 업무적인 의미의 이벤트가 아니라서 제외
   - 알림전달됨 :  해당 업무내에서 꼭 처리해야하는 기능이지만, 업무적으로 의미있게 공유할 이벤트가 아니라서 제외
 
 ### 액터, 커맨드 부착하여 읽기 좋게
+  ![image](https://user-images.githubusercontent.com/61722732/89151365-c3cf2080-d59b-11ea-94b4-3c6c25206bf7.JPG)
 
 ### 어그리게잇으로 묶기
+  ![image](https://user-images.githubusercontent.com/61722732/89151387-d21d3c80-d59b-11ea-9a34-4e2e9afe87b5.JPG)
 
   * 숙소의 숙소관리, 예약의 예약관리, 결제의 결제이력, 알림의 알림이력, 마이페이지는 그와 연결된 command 와 event 들에 의하여 트랜잭션이 유지되어야 하는 단위로 그들 끼리 묶어줌
 
 ### 바운디드 컨텍스트로 묶기
+  ![image](https://user-images.githubusercontent.com/61722732/89151420-e6613980-d59b-11ea-865e-797db2722165.JPG)
 
 * 도메인 서열 분리 
   - Core Domain:   숙소, 예약 : 없어서는 안될 핵심 서비스이며, 연견 Up-time SLA 수준을 99.999% 목표, 배포주기는 app 의 경우 1주일 1회 미만, store 의 경우 1개월 1회 미만
@@ -96,10 +88,16 @@ Airbnb 와 같은 숙박 공유 서비스입니다.
   - General Domain:   결제 : 결제서비스로 3rd Party 외부 서비스를 사용하는 것이 경쟁력이 높음 (핑크색으로 이후 전환할 예정)
 
 ### 폴리시 부착 (괄호는 수행주체, 폴리시 부착을 둘째단계에서 해놔도 상관 없음. 전체 연계가 초기에 드러남)
+  ![image](https://user-images.githubusercontent.com/61722732/89151438-f547ec00-d59b-11ea-9b0a-7e54da94a0f0.JPG)
 
 ### 폴리시의 이동과 컨텍스트 매핑 (점선은 Pub/Sub, 실선은 Req/Resp)
+  ![image](https://user-images.githubusercontent.com/61722732/89151466-02fd7180-d59c-11ea-8f08-d43a424b893f.JPG)
 
 ### 기능적 요구사항 검증
+  ![슬라이드13](https://user-images.githubusercontent.com/61722732/89151515-1f011300-d59c-11ea-9029-565bfd0dd26e.JPG)
+  ![슬라이드14](https://user-images.githubusercontent.com/61722732/89151518-21fc0380-d59c-11ea-9f22-727056c291dc.JPG)
+  ![슬라이드15](https://user-images.githubusercontent.com/61722732/89151524-245e5d80-d59c-11ea-87d3-842e297ff490.JPG)
+  ![슬라이드16](https://user-images.githubusercontent.com/61722732/89151531-26282100-d59c-11ea-8fdb-4f2abc1be094.JPG)
 
   * 호스트가 속소를 등록한다. (ok)
   * 호스트가 숙소 공유를 중단한다. (ok)
@@ -113,15 +111,15 @@ Airbnb 와 같은 숙박 공유 서비스입니다.
   * 결제가 취소되면, 결제 취소 내용을 게스트에게 전달한다. (ok)
 
 ### 비기능 요구사항 검증
+  ![슬라이드17](https://user-images.githubusercontent.com/61722732/89151536-29231180-d59c-11ea-9294-b8f457143d57.JPG)
 
-  * 마이크로 서비스를 넘나드는 시나리오에 대한 트랜잭션 처리
+* 마이크로 서비스를 넘나드는 시나리오에 대한 트랜잭션 처리
     - 숙소 예약시 결제처리:  결제가 완료되지 않은 예약은 절대 받지 않는다에 따라, ACID 트랜잭션 적용. 예약 완료시 결제처리에 대해서는 Request-Response 방식 처리
     - 예약 완료시 알림 처리:  예약에서 알림 마이크로서비스로 예약 완료 내용을 전달되는 과정에 있어서 알림 마이크로서비스가 별도의 배포주기를 가지기 때문에 Eventual Consistency 방식으로 트랜잭션 처리함.
     - 나머지 모든 inter-microservice 트랜잭션: 예약상태, 예약취소 등 모든 이벤트에 대해 알림 처리하는 등, 데이터 일관성의 시점이 크리티컬하지 않은 모든 경우가 대부분이라 판단, Eventual Consistency 를 기본으로 채택함.
 
 ## 헥사고날 아키텍처 다이어그램 도출
-    
-![image](https://user-images.githubusercontent.com/487999/79684772-eba9ab00-826e-11ea-9405-17e2bf39ec76.png)
+  ![슬라이드18](https://user-images.githubusercontent.com/61722732/89151539-2a543e80-d59c-11ea-9400-0aad70e06be4.JPG)
 
   * Chris Richardson, MSA Patterns 참고하여 Inbound adaptor와 Outbound adaptor를 구분함
   * 호출관계에서 PubSub 과 Req/Resp 를 구분함

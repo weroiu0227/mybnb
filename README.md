@@ -704,7 +704,9 @@ HTTP/1.1 201     0.70 secs:     207 bytes ==> POST http://booking:8080/bookings
 
 - 새버전으로의 배포 시작
 ```
-kubectl set image ...
+# 컨테이너 이미지 Update
+kubectl set image deploy booking booking=<ACCOUNT ID>.dkr.ecr.ap-northeast-2.amazonaws.com/booking:latest -n mybnb 
+
 ```
 
 - seige 의 화면으로 넘어가서 Availability 가 100% 미만으로 떨어졌는지 확인

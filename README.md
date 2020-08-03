@@ -732,6 +732,78 @@ Concurrency:		       96.02
 배포기간 동안 Availability 가 변화없기 때문에 무정지 재배포가 성공한 것으로 확인됨.
 
 
+## ConfigMap 사용
+
+시스템별로 또는 운영중에 동적으로 변경 가능성이 있는 설정들을 ConfigMap을 사용하여 관리합니다.
+
+* configmap.yaml
+```
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mybnb-config
+  namespace: mybnb
+data:
+  api.url.payment: http://pay:8080
+  alarm.prefix: Hello
+```
+* booking.yaml (configmap 사용)
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booking
+  namespace: mybnb
+  labels:
+    app: booking
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: booking
+  template:
+    metadata:
+      labels:
+        app: booking
+    spec:
+      containers:
+        - name: booking
+          image: 496278789073.dkr.ecr.ap-northeast-2.amazonaws.com/mybnb-booking:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: api.url.payment
+              valueFrom:
+                configMapKeyRef:
+                  name: mybnb-config
+                  key: api.url.payment
+          resources:
+```
+* kubectl describe pod/booking-588cb89c6b-gmw8h -n mybnb
+```
+Containers:
+  booking:
+    Container ID:   docker://0b90fe0d06629fc367fa83273abecba2724958a0b838c058553d193a86c3e0fe
+    Image:          496278789073.dkr.ecr.ap-northeast-2.amazonaws.com/mybnb-booking:latest
+    Image ID:       docker-pullable://496278789073.dkr.ecr.ap-northeast-2.amazonaws.com/mybnb-booking@sha256:59abe6ec02e165fda1c8e3dbf3e8bcedf7fb5edc53fcffca5f708a70969452f3
+    Port:           8080/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Mon, 03 Aug 2020 16:48:56 +0900
+    Ready:          True
+    Restart Count:  0
+    Limits:
+      cpu:  500m
+    Requests:
+      cpu:      200m
+    Liveness:   http-get http://:8080/actuator/health delay=120s timeout=2s period=5s #success=1 #failure=5
+    Readiness:  http-get http://:8080/actuator/health delay=10s timeout=2s period=5s #success=1 #failure=10
+    Environment:
+      api.url.payment:  <set to the key 'api.url.payment' of config map 'mybnb-config'>  Optional: false
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-mrczz (ro)
+```
+
 # 신규 개발 조직의 추가
 
   ![image](https://user-images.githubusercontent.com/487999/79684133-1d6c4300-826a-11ea-94a2-602e61814ebf.png)

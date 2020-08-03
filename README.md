@@ -688,7 +688,7 @@ Concurrency:		       96.02
 
 - seige 로 배포작업 직전에 워크로드를 모니터링 함.
 ```
-$ siege -v -c100 -t120S -r10 --content-type "application/json" 'http://booking:8080/bookings POST {"roomId":1, "name":"호텔", "price":1000, "address":"서울", "host":"Superman", "guest":"배트맨", "usedate":"20201230"}'
+$ siege -v -c1 -t300S -r10 --content-type "application/json" 'http://booking:8080/bookings POST {"roomId":1, "name":"호텔", "price":1000, "address":"서울", "host":"Superman", "guest":"배트맨", "usedate":"20201230"}'
 
 ** SIEGE 4.0.5
 ** Preparing 100 concurrent users for battle.

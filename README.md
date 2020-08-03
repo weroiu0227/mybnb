@@ -131,19 +131,25 @@ Airbnb 와 같은 숙박 공유 서비스입니다.
 분석/설계 단계에서 도출된 헥사고날 아키텍처에 따라, 각 BC별로 대변되는 마이크로 서비스들을 스프링부트로 구현하였다. 구현한 각 서비스를 로컬에서 실행하는 방법은 아래와 같다 (각자의 포트넘버는 8081 ~ 808n 이다)
 
 ```
-cd 숙소
+cd gateway
 mvn spring-boot:run
 
-cd 예약
+cd html
+mvn spring-boot:run
+
+cd room
 mvn spring-boot:run 
 
-cd 결제
+cd booking
+mvn spring-boot:run 
+
+cd pay
 mvn spring-boot:run  
 
-cd 마이페이지
+cd mypage
 mvn spring-boot:run
 
-cd 알림
+cd alarm
 mvn spring-boot:run
 ```
 
@@ -458,9 +464,12 @@ http http://booking:8080/alarms # 알림이력조회
 ```
 # application.yml
 
+feign:
+  hystrix:
+    enabled: true
+
 hystrix:
   command:
-    # 전역설정
     default:
       execution.isolation.thread.timeoutInMilliseconds: 610
 

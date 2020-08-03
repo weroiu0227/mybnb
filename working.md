@@ -32,7 +32,7 @@ sudo mv /tmp/eksctl /usr/local/bin
 
 # EKS Cluster create
 <pre>
-eksctl create cluster --name (클러스터명) --version 1.15 --nodegroup-name standard-workers --node-type t3.medium --nodes 2 --nodes-min 1 --nodes-max 3
+eksctl create cluster --name (클러스터명) --version 1.15 --nodegroup-name standard-workers --node-type t3.medium --nodes 3 --nodes-min 1 --nodes-max 4
 </pre>
 
 # EKS Cluster settings

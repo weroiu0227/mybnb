@@ -367,18 +367,18 @@ public class Booking {
 - 동기식 호출에서는 호출 시간에 따른 타임 커플링이 발생하며, 결제 시스템이 장애가 나면 주문도 못받는다는 것을 확인:
 ```
 # 결제 서비스를 잠시 내려놓음 (ctrl+c)
+kubectl delete -f pay.yaml
 
 # 예약처리
-http localhost:8082/예약s roomId=1  #Fail
-http localhost:8082/예약s roomId=2  #Fail
+http POST http://booking:8080/bookings roomId=1 name=호텔 price=1000 address=서울 host=Superman guest=배트맨 usedate=20201010 #Fail
+http POST http://booking:8080/bookings roomId=2 name=펜션 price=1000 address=양평 host=Superman guest=홍길동 usedate=20201011 #Fail
 
 # 결제서비스 재기동
-cd 결제
-mvn spring-boot:run
+kubectl apply -f pay.yaml
 
 # 예약처리
-http localhost:8082/예약s roomId=1  #Success
-http localhost:8082/예약s roomId=2  #Success
+http POST http://booking:8080/bookings roomId=1 name=호텔 price=1000 address=서울 host=Superman guest=배트맨 usedate=20201010 #Success
+http POST http://booking:8080/bookings roomId=2 name=펜션 price=1000 address=양평 host=Superman guest=홍길동 usedate=20201011 #Success
 ```
 
 - 또한 과도한 요청시에 서비스 장애가 도미노 처럼 벌어질 수 있다. (서킷브레이커, 폴백 처리는 운영단계에서 설명한다.)
@@ -390,18 +390,18 @@ http localhost:8082/예약s roomId=2  #Success
  
 - 이를 위하여 예약관리, 결제관리에 기록을 남긴 후에 곧바로 완료되었다는 도메인 이벤트를 카프카로 송출한다(Publish)
 ```
-package mybnb;
-
 @Entity
-@Table(name="결제관리_table")
-public class 결제관리 {
+@Table(name="Payment_table")
+public class Payment {
 
- ...
-    @PrePersist
-    public void onPrePersist(){
-        결제승인됨 결제승인됨 = new 결제승인됨();
-        BeanUtils.copyProperties(this, 결제승인됨);
-        결제승인됨.publish();
+   ...
+
+    @PostPersist
+    public void onPostPersist(){
+        PayApproved payApproved = new PayApproved();
+        BeanUtils.copyProperties(this, payApproved);
+        payApproved.setStatus(getStatus());
+        payApproved.publishAfterCommit();
     }
 
 }
@@ -413,57 +413,53 @@ public class 결제관리 {
 public class PolicyHandler{
 
     @StreamListener(KafkaProcessor.INPUT)
-    public void whenever예약됨_알림처리(@Payload 예약됨 예약됨){
-        if(예약됨.isMe()){
-            System.out.println("##### listener 예약됨 알림처리 : " + 예약됨.toJson());
+    public void wheneverPayApproved_Notify(@Payload PayApproved payApproved){
+        if(payApproved.isMe()){
+            System.out.println("##### listener Notify : " + payApproved.toJson());
         }
     }
-
     @StreamListener(KafkaProcessor.INPUT)
-    public void whenever결제승인됨_알림처리(@Payload 결제승인됨 결제승인됨){
-        if(결제승인됨.isMe()){
-            System.out.println("##### listener 결제승인됨 알림처리 : " + 결제승인됨.toJson());
+    public void wheneverPayCanceled_Notify(@Payload PayCanceled payCanceled){
+        if(payCanceled.isMe()){
+            System.out.println("##### listener Notify : " + payCanceled.toJson());
         }
     }
-    
-}
 ```
 
 - 실제 구현을 하자면, 카톡 등으로 알림을 처리합니다.:
 ```
-  @Autowired 알림이력Repository 알림이력Repository;
-  
-  @StreamListener(KafkaProcessor.INPUT)
-  public void whenever결제승인됨_알림처리(@Payload 결제승인됨 결제승인됨){
+@Service
+public class PolicyHandler{
 
-      if(결제승인됨.isMe()){
-          카톡전송(" Mybnb 알림 : " + 결제승인됨.toString());
+    @Autowired
+    private AlarmRepository alarmRepository;
 
-          알림이력 알림이력 = new 알림이력();
-          알림이력.setId(결제승인됨.get예약Id());
-          알림이력Repository.save(알림이력);
-      }
-  }
-
-```
+    @StreamListener(KafkaProcessor.INPUT)
+    public void wheneverPayApproved_Notify(@Payload PayApproved payApproved){
+        if(payApproved.isMe()){
+            addNotificationHistory(payApproved.getGuest(), "PayApproved");
+            addNotificationHistory(payApproved.getHost(), "PayApproved");
+        }
+    }
+ ```
 
 알림 시스템은 예약/결제와 완전히 분리되어있으며, 이벤트 수신에 따라 처리되기 때문에, 알림 시스템이 유지보수로 인해 잠시 내려간 상태라도 예약을 받는데 문제가 없다:
 ```
-# 알림 서비스를 잠시 내려놓음 (ctrl+c)
+# 알림 서비스를 잠시 내려놓음
+kubectl delete -f alarm.yaml
 
 # 예약처리
-http localhost:8082/예약s roomId=1  #Fail
-http localhost:8082/예약s roomId=2  #Fail
+http POST http://booking:8080/bookings roomId=1 name=호텔 price=1000 address=서울 host=Superman guest=배트맨 usedate=20201010 #Success
+http POST http://booking:8080/bookings roomId=2 name=펜션 price=1000 address=양평 host=Superman guest=홍길동 usedate=20201011 #Success
 
 # 알림이력 확인
-http localhost:8082/알림이력s # 알림이력조회 불가
+http http://booking:8080/alarms # 알림이력조회 불가
 
 # 알림 서비스 기동
-cd 알림
-mvn spring-boot:run
+kubectl apply -f alarm.yaml
 
 # 알림이력 확인
-http localhost:8082/알림이력s # 알림이력조회
+http http://booking:8080/alarms # 알림이력조회
 ```
 
 # 운영
@@ -493,7 +489,7 @@ hystrix:
 
 - 피호출 서비스(결제) 의 임의 부하 처리 - 400 밀리에서 증감 220 밀리 정도 왔다갔다 하게
 ```
-# 결제관리.java (Entity)
+# Payment.java (Entity)
 
     @PrePersist
     public void onPrePersist(){  //결제이력을 저장한 후 적당한 시간 끌기
@@ -515,7 +511,7 @@ hystrix:
 - 60초 동안 실시
 
 ```
-$ siege -c100 -t60S -r10 --content-type "application/json" 'http://localhost:8081/orders POST {"item": "chicken"}'
+$ siege -v -c100 -t60S -r10 --content-type "application/json" 'http://booking:8080/bookings POST {"roomId":1, "name":"호텔", "price":1000, "address":"서울", "host":"Superman", "guest":"배트맨", "usedate":"20201230"}'
 
 ** SIEGE 4.0.5
 ** Preparing 100 concurrent users for battle.
@@ -652,14 +648,14 @@ Shortest transaction:	        0.00
 ### 오토스케일 아웃
 앞서 CB 는 시스템을 안정되게 운영할 수 있게 해줬지만 사용자의 요청을 100% 받아들여주지 못했기 때문에 이에 대한 보완책으로 자동화된 확장 기능을 적용하고자 한다. 
 
-
 - 결제서비스에 대한 replica 를 동적으로 늘려주도록 HPA 를 설정한다. 설정은 CPU 사용량이 15프로를 넘어서면 replica 를 10개까지 늘려준다:
 ```
-kubectl autoscale deploy pay --min=1 --max=10 --cpu-percent=15
+kubectl autoscale deploy pay -n mybnb --min=1 --max=10 --cpu-percent=15
 ```
 - CB 에서 했던 방식대로 워크로드를 2분 동안 걸어준다.
 ```
-siege -c100 -t120S -r10 --content-type "application/json" 'http://localhost:8081/orders POST {"item": "chicken"}'
+$ siege -v -c100 -t120S -r10 --content-type "application/json" 'http://booking:8080/bookings POST {"roomId":1, "name":"호텔", "price":1000, "address":"서울", "host":"Superman", "guest":"배트맨", "usedate":"20201230"}'
+
 ```
 - 오토스케일이 어떻게 되고 있는지 모니터링을 걸어둔다:
 ```
@@ -692,16 +688,16 @@ Concurrency:		       96.02
 
 - seige 로 배포작업 직전에 워크로드를 모니터링 함.
 ```
-siege -c100 -t120S -r10 --content-type "application/json" 'http://localhost:8081/orders POST {"item": "chicken"}'
+$ siege -v -c100 -t120S -r10 --content-type "application/json" 'http://booking:8080/bookings POST {"roomId":1, "name":"호텔", "price":1000, "address":"서울", "host":"Superman", "guest":"배트맨", "usedate":"20201230"}'
 
 ** SIEGE 4.0.5
 ** Preparing 100 concurrent users for battle.
 The server is now under siege...
 
-HTTP/1.1 201     0.68 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     0.68 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     0.70 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     0.70 secs:     207 bytes ==> POST http://localhost:8081/orders
+HTTP/1.1 201     0.68 secs:     207 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 201     0.68 secs:     207 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 201     0.70 secs:     207 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 201     0.70 secs:     207 bytes ==> POST http://booking:8080/bookings
 :
 
 ```
@@ -727,8 +723,7 @@ Concurrency:		       96.02
 ```
 # deployment.yaml 의 readiness probe 의 설정:
 
-
-kubectl apply -f kubernetes/deployment.yaml
+kubectl apply -f booking.yaml
 ```
 
 - 동일한 시나리오로 재배포 한 후 Availability 확인:

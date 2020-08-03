@@ -20,6 +20,12 @@ spec:
           image: jihwancha/mybnb-alarm:latest
           ports:
             - containerPort: 8080
+          env:
+            - name: alarm.prefix
+              valueFrom:
+                configMapKeyRef:
+                  name: mybnb-config
+                  key: alarm.prefix
           readinessProbe:
             httpGet:
               path: '/actuator/health'

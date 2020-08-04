@@ -292,13 +292,10 @@ http http://booking:8080/bookings/1
 ## 폴리글랏 퍼시스턴스
 
   * 각 마이크로서비스의 특성에 따라 데이터 저장소를 RDB, DocumentDB/NoSQL 등 다양하게 사용할 수 있지만, 시간적/환경적 특성상 모두 H2 메모리DB를 적용하였다.
-  * DocumentDB/NoSQL를 적용하는 경우는 어그리케잇인 데이터 객체에 @Entity 가 아닌 @Document로 마킹하며, 별다른 작업없이 기존의 Entity Pattern 과 Repository Pattern 적용과 데이터베이스 제품의 설정 (application.yml) 만으로 가능하다.
-
 
 ## 폴리글랏 프로그래밍
   
   * 각 마이크로서비스의 특성에 따라 다양한 프로그래밍 언어를 사용하여 구현할 수 있지만, 시간적/환경적 특성상 Java를 이용하여 구현하였다.
-
 
 ## 동기식 호출 과 Fallback 처리
 
@@ -455,8 +452,8 @@ http http://booking:8080/alarms # 알림이력조회
 ## CI/CD 설정
 
   * 각 구현체들은 github의 각각의 source repository 에 구성
-  * 사용 CI/CD 플랫폼은 ? 
-  
+  * Image repository는 ECR 사용
+
 ## 동기식 호출 / 서킷 브레이킹 / 장애격리
 
 * 서킷 브레이킹 프레임워크의 선택: Spring FeignClient + Hystrix 옵션을 사용하여 구현함

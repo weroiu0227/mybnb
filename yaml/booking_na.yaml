@@ -26,29 +26,6 @@ spec:
                 configMapKeyRef:
                   name: mybnb-config
                   key: api.url.payment
-                  #  - name: feign.hystrix.enabled
-                  #value: 'false'
-          #resources:
-          #  limits:
-          #    cpu: 500m
-          #  requests:
-          #    cpu: 200m
-          readinessProbe:
-            httpGet:
-              path: '/actuator/health'
-              port: 8080
-            initialDelaySeconds: 10
-            timeoutSeconds: 2
-            periodSeconds: 5
-            failureThreshold: 10
-          livenessProbe:
-            httpGet:
-              path: '/actuator/health'
-              port: 8080
-            initialDelaySeconds: 120
-            timeoutSeconds: 2
-            periodSeconds: 5
-            failureThreshold: 5
 
 ---
 

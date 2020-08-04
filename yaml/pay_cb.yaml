@@ -1,38 +1,30 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: booking
+  name: pay
   namespace: mybnb
   labels:
-    app: booking
+    app: pay
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: booking
+      app: pay
   template:
     metadata:
       labels:
-        app: booking
+        app: pay
     spec:
       containers:
-        - name: booking
-          image: 496278789073.dkr.ecr.ap-northeast-2.amazonaws.com/mybnb-booking:latest
+        - name: pay
+          image: 496278789073.dkr.ecr.ap-northeast-2.amazonaws.com/mybnb-pay:cb
           ports:
             - containerPort: 8080
-          env:
-            - name: api.url.payment
-              valueFrom:
-                configMapKeyRef:
-                  name: mybnb-config
-                  key: api.url.payment
-                  #  - name: feign.hystrix.enabled
-                  #value: 'false'
-          #resources:
-          #  limits:
-          #    cpu: 500m
-          #  requests:
-          #    cpu: 200m
+          resources:
+            limits:
+              cpu: 500m
+            requests:
+              cpu: 200m
           readinessProbe:
             httpGet:
               path: '/actuator/health'
@@ -55,13 +47,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: booking
+  name: pay
   namespace: mybnb
   labels:
-    app: booking
+    app: pay
 spec:
   ports:
     - port: 8080
       targetPort: 8080
   selector:
-    app: booking
+    app: pay

@@ -18,6 +18,7 @@ spec:
       containers:
         - name: pay
           image: 496278789073.dkr.ecr.ap-northeast-2.amazonaws.com/mybnb-pay:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           resources:

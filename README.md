@@ -136,6 +136,7 @@ Airbnb 와 같은 공유 숙소 서비스 따라하기 입니다.
 cd mybnb/yaml
 
 kubectl apply -f configmap.yaml
+
 kubectl apply -f gateway.yaml
 kubectl apply -f html.yaml
 kubectl apply -f room.yaml
@@ -268,7 +269,12 @@ public interface PaymentRepository extends PagingAndSortingRepository<Payment, L
 
 }
 ```
-- 적용 후 REST API 테스트
+- siege 접속
+```
+kubctl exec -it siege -n mybnb -- /bin/bash
+```
+
+- 적용 후 REST API 테스트 (siege 에서)
 ```
 # 숙소 서비스의 등록처리
 http POST http://room:8080/rooms name=호텔 price=1000 address=서울 host=Superman
@@ -346,17 +352,17 @@ public class Booking {
 # 결제 서비스를 잠시 내려놓음 (ctrl+c)
 kubectl delete -f pay.yaml
 
-# 예약처리
+# 예약처리 (siege 에서)
 http POST http://booking:8080/bookings roomId=1 name=호텔 price=1000 address=서울 host=Superman guest=배트맨 usedate=20201010 #Fail
 http POST http://booking:8080/bookings roomId=2 name=펜션 price=1000 address=양평 host=Superman guest=홍길동 usedate=20201011 #Fail
 
-# 결제서비스 재기동전에 아래의 비동기식 호출 기능 점검 테스트 수행
+# 결제서비스 재기동전에 아래의 비동기식 호출 기능 점검 테스트 수행 (siege 에서)
 http DELETE http://booking:8080/bookings/1 #Success
 
 # 결제서비스 재기동
 kubectl apply -f pay.yaml
 
-# 예약처리
+# 예약처리 (siege 에서)
 http POST http://booking:8080/bookings roomId=1 name=호텔 price=1000 address=서울 host=Superman guest=배트맨 usedate=20201010 #Success
 http POST http://booking:8080/bookings roomId=2 name=펜션 price=1000 address=양평 host=Superman guest=홍길동 usedate=20201011 #Success
 ```
@@ -428,17 +434,17 @@ public class PolicyHandler{
 # 알림 서비스를 잠시 내려놓음
 kubectl delete -f alarm.yaml
 
-# 예약처리
+# 예약처리 (siege 에서)
 http POST http://booking:8080/bookings roomId=1 name=호텔 price=1000 address=서울 host=Superman guest=배트맨 usedate=20201010 #Success
 http POST http://booking:8080/bookings roomId=2 name=펜션 price=1000 address=양평 host=Superman guest=홍길동 usedate=20201011 #Success
 
-# 알림이력 확인
+# 알림이력 확인 (siege 에서)
 http http://booking:8080/alarms # 알림이력조회 불가
 
 # 알림 서비스 기동
 kubectl apply -f alarm.yaml
 
-# 알림이력 확인
+# 알림이력 확인 (siege 에서)
 http http://booking:8080/alarms # 알림이력조회
 ```
 
@@ -489,8 +495,6 @@ hystrix:
     }
 ```
 
-* kubectl apply -f siege.yaml
-* kubtctl exec -it siege -n mybnb -- /bin/bash
 * 부하테스터 siege 툴을 통한 서킷 브레이커 동작 확인:
 - 동시사용자 100명
 - 60초 동안 실시

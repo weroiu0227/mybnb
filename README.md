@@ -276,7 +276,7 @@ public interface PaymentRepository extends PagingAndSortingRepository<Payment, L
 
 }
 ```
-- 적용 후 REST API 의 테스트
+- 적용 후 REST API 테스트
 ```
 # 숙소 서비스의 등록처리
 http POST http://room:8080/rooms name=호텔 price=1000 address=서울 host=Superman
@@ -287,6 +287,7 @@ http POST http://booking:8080/bookings roomId=1 name=호텔 price=1000 address=�
 # 예약 상태 확인
 http http://booking:8080/bookings/1
 ```
+- HTML 화면을 통해서 각 서비스 기능 수행
 
 ## 폴리글랏 퍼시스턴스
 
@@ -356,6 +357,9 @@ kubectl delete -f pay.yaml
 # 예약처리
 http POST http://booking:8080/bookings roomId=1 name=호텔 price=1000 address=서울 host=Superman guest=배트맨 usedate=20201010 #Fail
 http POST http://booking:8080/bookings roomId=2 name=펜션 price=1000 address=양평 host=Superman guest=홍길동 usedate=20201011 #Fail
+
+# 결제서비스 재기동전에 아래의 비동기식 호출 기능 점검 테스트 수행
+http DELETE http://booking:8080/bookings/1 #Success
 
 # 결제서비스 재기동
 kubectl apply -f pay.yaml
@@ -493,8 +497,8 @@ hystrix:
     }
 ```
 
-* kubectl create deploy siege --image=apexacme/siege-nginx
-* kubtctl exec -it pod/siege -- /bin/bash
+* kubectl apply -f siege.yaml
+* kubtctl exec -it siege -n mybnb -- /bin/bash
 * 부하테스터 siege 툴을 통한 서킷 브레이커 동작 확인:
 - 동시사용자 100명
 - 60초 동안 실시
@@ -611,9 +615,8 @@ Failed transactions:            1056
 Longest transaction:           10.77
 Shortest transaction:           0.08
 ```
-- 운영시스템은 죽지 않고 지속적으로 CB 에 의하여 적절히 회로가 열림과 닫힘이 벌어지면서 자원을 보호하고 있음을 보여줌. 하지만, 42.985% 가 성공하였고, 67%가 실패했다는 것은 고객 사용성에 있어 좋지 않기 때문에 Retry 설정과 동적 Scale out (replica의 자동적 추가,HPA) 을 통하여 시스템을 확장 해주는 후속처리가 필요.
+- 운영시스템은 죽지 않고 지속적으로 CB 에 의하여 적절히 회로가 열림과 닫힘이 벌어지면서 자원을 보호하고 있음을 보여줌. 하지만, 42.985% 가 성공하였고, 67%가 실패했다는 것은 고객 사용성에 있어 좋지 않기 때문에 동적 Scale out (replica의 자동적 추가,HPA) 을 통하여 시스템을 확장 해주는 후속처리가 필요.
 
-- Retry 의 설정 (istio)
 - Availability 가 높아진 것을 확인 (siege)
 
 ### 오토스케일 아웃
@@ -623,13 +626,11 @@ Shortest transaction:           0.08
 - kubectl apply -f booking.yaml 실행
 - kubectl apply -f pay.yaml 실행
 
-- 결제서비스 배포시 resource 설정 적용
+- 결제서비스 배포시 resource 설정 적용되어 있음
 ```
     spec:
       containers:
-      
           ...
-          
           resources:
             limits:
               cpu: 500m
@@ -686,6 +687,7 @@ Shortest transaction:           0.00
 ## 무정지 재배포
 
 * 먼저 무정지 재배포가 100% 되는 것인지 확인하기 위해서 Autoscaler 이나 CB 설정을 제거함
+(위의 시나리오에서 제거되었음)
 
 - seige 로 배포작업 직전에 워크로드를 모니터링 함.
 ```
@@ -705,7 +707,7 @@ HTTP/1.1 201     0.70 secs:     207 bytes ==> POST http://booking:8080/bookings
 
 - 새버전으로의 배포 시작
 ```
-# 컨테이너 이미지 Update
+# 컨테이너 이미지 Update (readness, liveness 미설정 상태)
 - kubectl apply -f booking_na.yaml 실행
 
 ```

@@ -62,7 +62,7 @@ Airbnb 와 같은 공유 숙소 서비스 따라하기 입니다.
   ![image](https://user-images.githubusercontent.com/61722732/89151259-87032980-d59b-11ea-89a9-4f36f6807ab3.JPG)
 
 ## Event Storming 결과
-* MSAEz 로 모델링한 이벤트스토밍 결과 : http://msaez.io/#/storming/TWDBQXDzOJbymFE78o3DdlQ90XG3/mine/2f61f8e783098ff1c0846577ac58a501/-MCC6v6zjziZTBGEqE3Z
+* MSAEz 로 모델링한 이벤트스토밍 결과 : http://msaez.io/#/storming/TWDBQXDzOJbymFE78o3DdlQ90XG3/mine/df3c8b244d858a53e494f65d203d8dfb/-MDnuFE6EJcSWUkOqn_K
 
 ### 이벤트 도출
   ![image](https://user-images.githubusercontent.com/61722732/89151292-9f734400-d59b-11ea-9de6-d58aa8226d47.JPG)

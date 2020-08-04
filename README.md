@@ -439,13 +439,13 @@ http POST http://booking:8080/bookings roomId=1 name=호텔 price=1000 address=�
 http POST http://booking:8080/bookings roomId=2 name=펜션 price=1000 address=양평 host=Superman guest=홍길동 usedate=20201011 #Success
 
 # 알림이력 확인 (siege 에서)
-http http://booking:8080/alarms # 알림이력조회 불가
+http http://alarm:8080/alarms # 알림이력조회 불가
 
 # 알림 서비스 기동
 kubectl apply -f alarm.yaml
 
 # 알림이력 확인 (siege 에서)
-http http://booking:8080/alarms # 알림이력조회
+http http://alarm:8080/alarms # 알림이력조회
 ```
 
 # 운영

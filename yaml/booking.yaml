@@ -26,6 +26,8 @@ spec:
                 configMapKeyRef:
                   name: mybnb-config
                   key: api.url.payment
+            - name: feign.hystrix.enabled
+              value: true
           resources:
             limits:
               cpu: 500m

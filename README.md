@@ -373,9 +373,13 @@ kubectl exec -it siege -n mybnb -- /bin/bash
 
 - kiali 화면 접속
 http://a808fbb3bb7514eb7b08f595489d54e6-1558117695.ap-northeast-2.elb.amazonaws.com:20001/kiali/console
+![슬라이드1](https://user-images.githubusercontent.com/61722732/89362526-14b05780-d709-11ea-91c5-91bcb5c6e1b1.JPG)
+
 
 - (웹화면에서) 적용 후 REST API 테스트 
 http://a59f2304940914b7ca3875b12e62e321-738700923.ap-northeast-2.elb.amazonaws.com:8080/html/index.html
+![슬라이드2](https://user-images.githubusercontent.com/61722732/89362530-15e18480-d709-11ea-8deb-d15ca8bafa39.JPG)
+![슬라이드3](https://user-images.githubusercontent.com/61722732/89362531-167a1b00-d709-11ea-9587-ef56421befd3.JPG)
 
 - (siege 에서) 적용 후 REST API 테스트 
 ```
@@ -703,6 +707,7 @@ Shortest transaction:           0.05
 ```
 
 * DestinationRule 적용되어 서킷 브레이킹 동작 확인 (kiali 화면)
+![슬라이드4](https://user-images.githubusercontent.com/61722732/89362532-167a1b00-d709-11ea-8981-07bf788080b5.JPG)
 
 
 * 다시 부하 발생하여 DestinationRule 적용 제거하여 정상 처리 확인

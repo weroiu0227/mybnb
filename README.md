@@ -176,6 +176,9 @@ kubectl apply -f pay.yaml
 kubectl apply -f mypage.yaml
 kubectl apply -f alarm.yaml
 kubectl apply -f siege.yaml
+
+# mybnb gateway service type 변경
+(ClusterIP -> LoadBalancer)
 ```
 
 ## DDD 의 적용

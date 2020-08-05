@@ -489,6 +489,30 @@ http http://alarm:8080/alarms # 알림이력조회
 
 ### 방식1) 서킷 브레이킹 프레임워크의 선택: istio-injection + DestinationRule
 
+* istio-injection 적용
+```
+kubectl label namespace mybnb istio-injection=enabled
+```
+* 예약, 결제 서비스 모두 아무런 변경 없음
+
+* 부하테스터 siege 툴을 통한 서킷 브레이커 동작 확인:
+- 동시사용자 100명
+- 60초 동안 실시
+```
+$ siege -v -c100 -t60S -r10 --content-type "application/json" 'http://booking:8080/bookings POST {"roomId":1, "name":"호텔", "price":1000, "address":"서울", "host":"Superman", "guest":"배트맨", "usedate":"20201230"}'
+
+* 서킷 브레이킹을 위한 DestinationRule 적용
+```
+cd mybnb/yaml
+kubectl apply -f dr-pay.yaml
+```
+* DestinationRule 적용되어 서킷 브레이킹 동작 확인 (kiali 화면)
+
+* 다시 부하 발생하여 DestinationRule 적용 제거하여 정상 처리 확인
+```
+cd mybnb/yaml
+kubectl delete -f dr-pay.yaml
+```
 
 ### 방식2) 서킷 브레이킹 프레임워크의 선택: Spring FeignClient + Hystrix 옵션을 사용하여 구현함
 

@@ -872,15 +872,16 @@ Shortest transaction:           0.08
 ### 오토스케일 아웃
 앞서 CB 는 시스템을 안정되게 운영할 수 있게 해줬지만 사용자의 요청을 100% 받아들여주지 못했기 때문에 이에 대한 보완책으로 자동화된 확장 기능을 적용하고자 한다. 
 
-* 위에서 설정된 CB는 제거해야함. (istio DestinationRule에서는 불필요)
-```
-kubectl apply -f booking.yaml
-kubectl apply -f pay.yaml
-```
-* istio injection 제거
+* (istio injection 적용한 경우) istio injection 적용 해제
 ```
 kubectl label namespace mybnb istio-injection=disabled --overwrite
 
+kubectl apply -f booking.yaml
+kubectl apply -f pay.yaml
+```
+
+* (Spring FeignClient + Hystrix 적용한 경우) 위에서 설정된 CB는 제거해야함.
+```
 kubectl apply -f booking.yaml
 kubectl apply -f pay.yaml
 ```
@@ -955,13 +956,17 @@ kubectl get deploy pay -n mybnb -w
 - 어느정도 시간이 흐른 후 (약 30초) 스케일 아웃이 벌어지는 것을 확인할 수 있다:
 ```
 NAME   READY   UP-TO-DATE   AVAILABLE   AGE
-pay    1/1     1            1           102s
-pay    1/3     1            1           2m55s
-pay    1/3     1            1           2m55s
-pay    1/3     1            1           2m55s
-pay    1/3     3            1           2m55s
-pay    2/3     3            2           4m12s
-pay    3/3     3            3           4m15s
+pay    1/1     1            1           4m21s
+pay    1/2     1            1           4m28s
+pay    1/2     1            1           4m28s
+pay    1/2     1            1           4m28s
+pay    1/2     2            1           4m28s
+pay    1/3     2            1           4m43s
+pay    1/3     2            1           4m43s
+pay    1/3     2            1           4m43s
+pay    1/3     3            1           4m43s
+pay    2/3     3            2           5m53s
+pay    3/3     3            3           5m59s
 :
 ```
 - siege 의 로그를 보아도 전체적인 성공률이 높아진 것을 확인 할 수 있다. 
@@ -1029,6 +1034,17 @@ Shortest transaction:           0.00
 ```
 # deployment.yaml 의 readiness probe 의 설정:
 - kubectl apply -f booking.yaml 실행
+
+NAME                           READY   STATUS        RESTARTS   AGE
+pod/alarm-bc469c66b-nn7r9      2/2     Running       1          58m
+pod/booking-67d766dc78-xzrzr   1/1     Terminating   0          73s
+pod/booking-6f85b67876-94nxl   1/1     Running       0          34s
+pod/gateway-7bd59945-g9hdq     2/2     Running       0          58m
+pod/html-78f648d5b-zhv2b       2/2     Running       0          58m
+pod/pay-755d679cbf-f56nd       1/1     Running       0          3m33s
+pod/pay-755d679cbf-lmtvh       1/1     Running       0          8m16s
+pod/pay-755d679cbf-qjbw6       1/1     Running       0          3m48s
+pod/siege                      1/1     Running       0          13m
 ```
 
 - 동일한 시나리오로 재배포 한 후 Availability 확인:

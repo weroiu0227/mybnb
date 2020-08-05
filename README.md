@@ -133,10 +133,41 @@ Airbnb 와 같은 공유 숙소 서비스 따라하기 입니다.
 분석/설계 단계에서 도출된 헥사고날 아키텍처에 따라, 각 BC별로 대변되는 마이크로 서비스들을 스프링부트로 구현하였다. 배포는 아래와 같이 수행한다.
 
 ```
+# eks cluster 생성
+eksctl create cluster --name team4-cluseter --version 1.15 --nodegroup-name standard-workers --node-type t3.medium --nodes 3 --nodes-min 1 --nodes-max 4
+
+# eks cluster 설정
+aws eks --region ap-northeast-2 update-kubeconfig --name team4-cluseter
+kubectl config current-context
+
+# metric server 설치
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.3.6/components.yaml
+
+# kafka 설치
+helm install --name my-kafka --namespace kafka incubator/kafka
+
+# istio 설치
+kubectl apply -f install/kubernetes/istio-demo.yaml
+
+# kiali service type 변경
+kubectl edit service/kiali -n istio-system
+(ClusterIP -> LoadBalancer)
+
+# mybnb namespace 생성
+kubectl create namespace mybnb
+
+# mybnb istio injection 설정
+kubectl label namespace mybnb istio-injection=enabled
+
+# mybnb image build & push
+cd mybnb/gateway
+mvn package
+docker build -t 496278789073.dkr.ecr.ap-northeast-2.amazonaws.com/mybnb-gateway:latest .
+docker push 496278789073.dkr.ecr.ap-northeast-2.amazonaws.com/mybnb-gateway:latest
+
+# mybnb deploy
 cd mybnb/yaml
-
 kubectl apply -f configmap.yaml
-
 kubectl apply -f gateway.yaml
 kubectl apply -f html.yaml
 kubectl apply -f room.yaml
@@ -144,7 +175,6 @@ kubectl apply -f booking.yaml
 kubectl apply -f pay.yaml
 kubectl apply -f mypage.yaml
 kubectl apply -f alarm.yaml
-
 kubectl apply -f siege.yaml
 ```
 
@@ -457,7 +487,10 @@ http http://alarm:8080/alarms # 알림이력조회
 
 ## 동기식 호출 / 서킷 브레이킹 / 장애격리
 
-* 서킷 브레이킹 프레임워크의 선택: Spring FeignClient + Hystrix 옵션을 사용하여 구현함
+### 방식1) 서킷 브레이킹 프레임워크의 선택: istio-injection + DestinationRule
+
+
+### 방식2) 서킷 브레이킹 프레임워크의 선택: Spring FeignClient + Hystrix 옵션을 사용하여 구현함
 
 시나리오는 예약-->결제 시의 연결을 RESTful Request/Response 로 연동하여 구현이 되어있고, 결제 요청이 과도할 경우 CB 를 통하여 장애격리.
 

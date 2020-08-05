@@ -503,7 +503,7 @@ kubectl label namespace mybnb istio-injection=enabled
 - 60초 동안 실시
 ```
 $ siege -v -c100 -t60S -r10 --content-type "application/json" 'http://booking:8080/bookings POST {"roomId":1, "name":"호텔", "price":1000, "address":"서울", "host":"Superman", "guest":"배트맨", "usedate":"20201230"}'
-
+```
 * 서킷 브레이킹을 위한 DestinationRule 적용
 ```
 cd mybnb/yaml

@@ -178,7 +178,71 @@ kubectl apply -f alarm.yaml
 kubectl apply -f siege.yaml
 
 # mybnb gateway service type 변경
+$ kubectl edit service/gateway -n mybnb
 (ClusterIP -> LoadBalancer)
+```
+
+* 현황
+```
+$ kubectl get ns
+NAME              STATUS   AGE
+default           Active   41h
+istio-system      Active   41h
+kafka             Active   41h
+kube-node-lease   Active   41h
+kube-public       Active   41h
+kube-system       Active   41h
+mybnb             Active   3m
+
+
+$ kubectl describe ns mybnb
+Name:         mybnb
+Labels:       istio-injection=enabled
+Annotations:  <none>
+Status:       Active
+
+No resource quota.
+
+No LimitRange resource.
+
+
+$ kubectl get all -n mybnb
+NAME                           READY   STATUS    RESTARTS   AGE
+pod/alarm-bc469c66b-nn7r9      2/2     Running   0          3m53s
+pod/booking-6f85b67876-rhwl2   2/2     Running   0          4m6s
+pod/gateway-7bd59945-g9hdq     2/2     Running   0          4m18s
+pod/html-78f648d5b-zhv2b       2/2     Running   0          4m14s
+pod/mypage-7587b7598b-l86jl    2/2     Running   0          3m57s
+pod/pay-755d679cbf-vmp2z       2/2     Running   0          4m
+pod/room-6c8cff5b96-78chb      2/2     Running   0          4m10s
+pod/siege                      2/2     Running   0          3m49s
+
+NAME              TYPE           CLUSTER-IP       EXTERNAL-IP                                                                   PORT(S)          AGE
+service/alarm     ClusterIP      10.100.36.234    <none>                                                                        8080/TCP         3m53s
+service/booking   ClusterIP      10.100.19.222    <none>                                                                        8080/TCP         4m6s
+service/gateway   LoadBalancer   10.100.195.171   a59f2304940914b7ca3875b12e62e321-738700923.ap-northeast-2.elb.amazonaws.com   8080:31754/TCP   4m18s
+service/html      ClusterIP      10.100.19.81     <none>                                                                        8080/TCP         4m14s
+service/mypage    ClusterIP      10.100.134.37    <none>                                                                        8080/TCP         3m57s
+service/pay       ClusterIP      10.100.210.94    <none>                                                                        8080/TCP         4m
+service/room      ClusterIP      10.100.78.233    <none>                                                                        8080/TCP         4m10s
+
+NAME                      READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/alarm     1/1     1            1           3m53s
+deployment.apps/booking   1/1     1            1           4m6s
+deployment.apps/gateway   1/1     1            1           4m18s
+deployment.apps/html      1/1     1            1           4m14s
+deployment.apps/mypage    1/1     1            1           3m57s
+deployment.apps/pay       1/1     1            1           4m
+deployment.apps/room      1/1     1            1           4m10s
+
+NAME                                 DESIRED   CURRENT   READY   AGE
+replicaset.apps/alarm-bc469c66b      1         1         1       3m53s
+replicaset.apps/booking-6f85b67876   1         1         1       4m6s
+replicaset.apps/gateway-7bd59945     1         1         1       4m18s
+replicaset.apps/html-78f648d5b       1         1         1       4m14s
+replicaset.apps/mypage-7587b7598b    1         1         1       3m57s
+replicaset.apps/pay-755d679cbf       1         1         1       4m
+replicaset.apps/room-6c8cff5b96      1         1         1       4m10s
 ```
 
 ## DDD 의 적용
@@ -304,10 +368,16 @@ public interface PaymentRepository extends PagingAndSortingRepository<Payment, L
 ```
 - siege 접속
 ```
-kubctl exec -it siege -n mybnb -- /bin/bash
+kubectl exec -it siege -n mybnb -- /bin/bash
 ```
 
-- 적용 후 REST API 테스트 (siege 에서)
+- kiali 화면 접속
+http://a808fbb3bb7514eb7b08f595489d54e6-1558117695.ap-northeast-2.elb.amazonaws.com:20001/kiali/console
+
+- (웹화면에서) 적용 후 REST API 테스트 
+http://a59f2304940914b7ca3875b12e62e321-738700923.ap-northeast-2.elb.amazonaws.com:8080/html/index.html
+
+- (siege 에서) 적용 후 REST API 테스트 
 ```
 # 숙소 서비스의 등록처리
 http POST http://room:8080/rooms name=호텔 price=1000 address=서울 host=Superman
@@ -383,21 +453,91 @@ public class Booking {
 - 동기식 호출에서는 호출 시간에 따른 타임 커플링이 발생하며, 결제 시스템이 장애가 나면 주문도 못받는다는 것을 확인:
 ```
 # 결제 서비스를 잠시 내려놓음 (ctrl+c)
-kubectl delete -f pay.yaml
+$ kubectl delete -f pay.yaml
+
+NAME                           READY   STATUS    RESTARTS   AGE
+pod/alarm-bc469c66b-nn7r9      2/2     Running   0          14m
+pod/booking-6f85b67876-rhwl2   2/2     Running   0          14m
+pod/gateway-7bd59945-g9hdq     2/2     Running   0          14m
+pod/html-78f648d5b-zhv2b       2/2     Running   0          14m
+pod/mypage-7587b7598b-l86jl    2/2     Running   0          14m
+pod/room-6c8cff5b96-78chb      2/2     Running   0          14m
+pod/siege                      2/2     Running   0          14m
 
 # 예약처리 (siege 에서)
 http POST http://booking:8080/bookings roomId=1 name=호텔 price=1000 address=서울 host=Superman guest=배트맨 usedate=20201010 #Fail
 http POST http://booking:8080/bookings roomId=2 name=펜션 price=1000 address=양평 host=Superman guest=홍길동 usedate=20201011 #Fail
 
+# 예약처리 시 에러 내용
+HTTP/1.1 500 Internal Server Error
+content-type: application/json;charset=UTF-8
+date: Wed, 05 Aug 2020 00:58:04 GMT
+server: envoy
+transfer-encoding: chunked
+x-envoy-upstream-service-time: 188
+
+{
+    "error": "Internal Server Error",
+    "message": "Could not commit JPA transaction; nested exception is javax.persistence.RollbackException: Error while committing the transaction",
+    "path": "/bookings",
+    "status": 500,
+    "timestamp": "2020-08-05T00:58:05.047+0000"
+}
+
 # 결제서비스 재기동전에 아래의 비동기식 호출 기능 점검 테스트 수행 (siege 에서)
 http DELETE http://booking:8080/bookings/1 #Success
+# 결과
+root@siege:/# http DELETE http://booking:8080/bookings/1
+HTTP/1.1 204 No Content
+date: Wed, 05 Aug 2020 00:59:03 GMT
+server: envoy
+x-envoy-upstream-service-time: 35
 
 # 결제서비스 재기동
-kubectl apply -f pay.yaml
+$ kubectl apply -f pay.yaml
+
+NAME                           READY   STATUS    RESTARTS   AGE
+pod/alarm-bc469c66b-nn7r9      2/2     Running   0          18m
+pod/booking-6f85b67876-rhwl2   2/2     Running   0          18m
+pod/gateway-7bd59945-g9hdq     2/2     Running   0          18m
+pod/html-78f648d5b-zhv2b       2/2     Running   0          18m
+pod/mypage-7587b7598b-l86jl    2/2     Running   0          18m
+pod/pay-755d679cbf-7l7dq       2/2     Running   0          84s
+pod/room-6c8cff5b96-78chb      2/2     Running   0          18m
+pod/siege                      2/2     Running   0          17m
+
 
 # 예약처리 (siege 에서)
 http POST http://booking:8080/bookings roomId=1 name=호텔 price=1000 address=서울 host=Superman guest=배트맨 usedate=20201010 #Success
 http POST http://booking:8080/bookings roomId=2 name=펜션 price=1000 address=양평 host=Superman guest=홍길동 usedate=20201011 #Success
+
+# 처리결과
+HTTP/1.1 201 Created
+content-type: application/json;charset=UTF-8
+date: Wed, 05 Aug 2020 01:01:54 GMT
+location: http://booking:8080/bookings/3
+server: envoy
+transfer-encoding: chunked
+x-envoy-upstream-service-time: 326
+
+{
+    "_links": {
+        "booking": {
+            "href": "http://booking:8080/bookings/3"
+        },
+        "self": {
+            "href": "http://booking:8080/bookings/3"
+        }
+    },
+    "address": "서울",
+    "guest": "배트맨",
+    "host": "Superman",
+    "name": "호텔",
+    "price": 1000,
+    "roomId": 1,
+    "usedate": "20201010"
+}
+
 ```
 
 - 또한 과도한 요청시에 서비스 장애가 도미노 처럼 벌어질 수 있다. (서킷브레이커, 폴백 처리는 운영단계에서 설명한다.)
@@ -492,7 +632,7 @@ http http://alarm:8080/alarms # 알림이력조회
 
 ### 방식1) 서킷 브레이킹 프레임워크의 선택: istio-injection + DestinationRule
 
-* istio-injection 적용
+* istio-injection 적용 (기 적용완료)
 ```
 kubectl label namespace mybnb istio-injection=enabled
 ```
@@ -503,13 +643,67 @@ kubectl label namespace mybnb istio-injection=enabled
 - 60초 동안 실시
 ```
 $ siege -v -c100 -t60S -r10 --content-type "application/json" 'http://booking:8080/bookings POST {"roomId":1, "name":"호텔", "price":1000, "address":"서울", "host":"Superman", "guest":"배트맨", "usedate":"20201230"}'
+
+HTTP/1.1 201     2.19 secs:     321 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 201     3.91 secs:     321 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 201     2.22 secs:     321 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 201     2.30 secs:     321 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 201     2.23 secs:     321 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 201     2.06 secs:     321 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 201     0.11 secs:     321 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 201     2.02 secs:     321 bytes ==> POST http://booking:8080/bookings
+
 ```
 * 서킷 브레이킹을 위한 DestinationRule 적용
 ```
 cd mybnb/yaml
 kubectl apply -f dr-pay.yaml
+
+HTTP/1.1 500     0.28 secs:     250 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 500     1.35 secs:     250 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 500     0.28 secs:     250 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 500     2.29 secs:     250 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 500     2.41 secs:     250 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 500     2.15 secs:     250 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 500     0.24 secs:     250 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 500     0.41 secs:     250 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 500     0.21 secs:     250 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 500     0.33 secs:     250 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 500     0.43 secs:     250 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 500     0.34 secs:     250 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 500     0.32 secs:     250 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 500     0.33 secs:     250 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 500     0.36 secs:     250 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 500     0.33 secs:     250 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 500     0.34 secs:     250 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 500     0.43 secs:     250 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 500     0.46 secs:     250 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 500     0.38 secs:     250 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 500     2.33 secs:     250 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 500     0.39 secs:     250 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 500     0.49 secs:     250 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 500     2.21 secs:     250 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 500     2.32 secs:     250 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 500     0.42 secs:     250 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 500     0.38 secs:     250 bytes ==> POST http://booking:8080/bookings
+HTTP/1.1 500     0.28 secs:     250 bytes ==> POST http://booking:8080/bookings
+
+Transactions:                   1986 hits
+Availability:                  63.88 %
+Elapsed time:                  47.75 secs
+Data transferred:               0.88 MB
+Response time:                  2.39 secs
+Transaction rate:              41.59 trans/sec
+Throughput:                     0.02 MB/sec
+Concurrency:                   99.57
+Successful transactions:        1986
+Failed transactions:            1123
+Longest transaction:            7.53
+Shortest transaction:           0.05
 ```
+
 * DestinationRule 적용되어 서킷 브레이킹 동작 확인 (kiali 화면)
+
 
 * 다시 부하 발생하여 DestinationRule 적용 제거하여 정상 처리 확인
 ```
@@ -678,8 +872,15 @@ Shortest transaction:           0.08
 ### 오토스케일 아웃
 앞서 CB 는 시스템을 안정되게 운영할 수 있게 해줬지만 사용자의 요청을 100% 받아들여주지 못했기 때문에 이에 대한 보완책으로 자동화된 확장 기능을 적용하고자 한다. 
 
-* 위에서 설정된 CB는 제거해야함.
+* 위에서 설정된 CB는 제거해야함. (istio DestinationRule에서는 불필요)
 ```
+kubectl apply -f booking.yaml
+kubectl apply -f pay.yaml
+```
+* istio injection 제거
+```
+kubectl label namespace mybnb istio-injection=disabled --overwrite
+
 kubectl apply -f booking.yaml
 kubectl apply -f pay.yaml
 ```
@@ -701,9 +902,47 @@ kubectl apply -f pay.yaml
 kubectl autoscale deploy pay -n mybnb --min=1 --max=3 --cpu-percent=15
 
 # 적용 내용
+NAME                           READY   STATUS    RESTARTS   AGE
+pod/alarm-bc469c66b-nn7r9      2/2     Running   0          25m
+pod/booking-6f85b67876-rhwl2   2/2     Running   0          25m
+pod/gateway-7bd59945-g9hdq     2/2     Running   0          25m
+pod/html-78f648d5b-zhv2b       2/2     Running   0          25m
+pod/mypage-7587b7598b-l86jl    2/2     Running   0          25m
+pod/pay-755d679cbf-7l7dq       2/2     Running   0          8m58s
+pod/room-6c8cff5b96-78chb      2/2     Running   0          25m
+pod/siege                      2/2     Running   0          25m
+
+NAME              TYPE           CLUSTER-IP       EXTERNAL-IP                                                                   PORT(S)          AGE
+service/alarm     ClusterIP      10.100.36.234    <none>                                                                        8080/TCP         25m
+service/booking   ClusterIP      10.100.19.222    <none>                                                                        8080/TCP         25m
+service/gateway   LoadBalancer   10.100.195.171   a59f2304940914b7ca3875b12e62e321-738700923.ap-northeast-2.elb.amazonaws.com   8080:31754/TCP   25m
+service/html      ClusterIP      10.100.19.81     <none>                                                                        8080/TCP         25m
+service/mypage    ClusterIP      10.100.134.37    <none>                                                                        8080/TCP         25m
+service/pay       ClusterIP      10.100.97.43     <none>                                                                        8080/TCP         8m58s
+service/room      ClusterIP      10.100.78.233    <none>                                                                        8080/TCP         25m
+
+NAME                      READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/alarm     1/1     1            1           25m
+deployment.apps/booking   1/1     1            1           25m
+deployment.apps/gateway   1/1     1            1           25m
+deployment.apps/html      1/1     1            1           25m
+deployment.apps/mypage    1/1     1            1           25m
+deployment.apps/pay       1/1     1            1           8m58s
+deployment.apps/room      1/1     1            1           25m
+
+NAME                                 DESIRED   CURRENT   READY   AGE
+replicaset.apps/alarm-bc469c66b      1         1         1       25m
+replicaset.apps/booking-6f85b67876   1         1         1       25m
+replicaset.apps/gateway-7bd59945     1         1         1       25m
+replicaset.apps/html-78f648d5b       1         1         1       25m
+replicaset.apps/mypage-7587b7598b    1         1         1       25m
+replicaset.apps/pay-755d679cbf       1         1         1       8m58s
+replicaset.apps/room-6c8cff5b96      1         1         1       25m
+
 NAME                                      REFERENCE        TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
-horizontalpodautoscaler.autoscaling/pay   Deployment/pay   <unknown>/15%   1         10        0          7s
+horizontalpodautoscaler.autoscaling/pay   Deployment/pay   <unknown>/15%   1         3         0          7s
 ```
+
 - CB 에서 했던 방식대로 워크로드를 3분 동안 걸어준다.
 ```
 $ siege -v -c100 -t180S -r10 --content-type "application/json" 'http://booking:8080/bookings POST {"roomId":1, "name":"호텔", "price":1000, "address":"서울", "host":"Superman", "guest":"배트맨", "usedate":"20201230"}'
